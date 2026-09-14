@@ -1,19 +1,19 @@
-# Next Steps
+# 次のステップ
 
-!!! tip "You've reached the end of the workshop"
+!!! tip "ワークショップはこれで終わりです"
 
-    You've gone from setting up the `uip` CLI to building agents and orchestrating them in Maestro — with a coding agent doing the build work alongside you.
+    `uip` CLI のセットアップから始まり、エージェントの構築、そして Maestro でのオーケストレーションまでを、コーディングエージェントと一緒に進めてきました。
 
-## Keep building
+## 引き続き構築する
 
-- Re-run the exercises against your own use cases and data.
-- Try a different coding agent (Cursor, Gemini CLI, Codex) with the same UiPath skills.
-- Extend a Maestro solution with an additional agent or human-in-the-loop step.
+- 自分のユースケースとデータで、各演習をもう一度やってみましょう。
+- 同じ UiPath スキルを使って、別のコーディングエージェント（Cursor、Gemini CLI、Codex）を試してみましょう。
+- Maestro ソリューションに、エージェントや人的判断のステップを追加して拡張してみましょう。
 
-## Learn more
+## もっと詳しく
 
-| Resource | Description |
-|----------|-------------|
-| [UiPath CLI docs](https://docs.uipath.com/uipath-cli) | Official `uip` CLI reference and how-to guides |
-| [UiPath skills (GitHub)](https://github.com/uipath/skills) | Source of the UiPath skills for coding agents |
-| [Coding Agents (UiPath)](https://www.uipath.com/developers/coding-agents) | Product overview |
+| リソース | 説明 |
+|----------|------|
+| [UiPath CLI ドキュメント](https://docs.uipath.com/uipath-cli) | `uip` CLI の公式リファレンスとハウツーガイド |
+| [UiPath skills（GitHub）](https://github.com/uipath/skills) | コーディングエージェント向け UiPath スキルのソース |
+| [Coding Agents（UiPath）](https://www.uipath.com/developers/coding-agents) | 製品概要 |

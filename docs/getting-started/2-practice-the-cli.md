@@ -1,62 +1,62 @@
-# Practicing the CLI
+# CLI を使ってみる
 
-!!! tip "Here is our plan for this lesson:"
+!!! tip "このレッスンの進め方"
 
-    1. Explore what the CLI can do.
-    2. Read something from the platform.
-    3. Ask the documentation a question with `docsai`.
-    4. Send feedback without leaving your terminal.
+    1. CLI で何ができるのかを見て回ります。
+    2. プラットフォームから情報を読み取ります。
+    3. `docsai` でドキュメントに質問します。
+    4. ターミナルから離れずにフィードバックを送ります。
 
-## Goal
+## ゴール
 
-Get comfortable with the `uip` CLI before you build with it. You'll run a few read-only commands, query the docs from the command line, and learn how to send feedback — so the CLI feels familiar when the agent starts driving it for you.
+`uip` CLI で構築を始める前に、CLI そのものに慣れておきましょう。読み取り専用のコマンドをいくつか実行し、コマンドラインからドキュメントを検索し、フィードバックの送り方を覚えます。こうしておくと、エージェントが CLI を操作し始めたときにも「見慣れた」感覚で追えるようになります。
 
-## Tools and skills
+## ツールとスキル
 
-Two extension systems sit beside the core CLI. **Tools** add commands that talk to UiPath services (**Orchestrator**, **Integration Service**, and so on). **Skills** teach your coding agent how to use those commands. You install both through the CLI, and during preview they update often — so pull the latest regularly.
+コア CLI の隣には、2 つの拡張の仕組みがあります。**ツール（Tools）** は UiPath のサービス（**Orchestrator**、**Integration Service** など）とやり取りするコマンドを追加します。**スキル（Skills）** は、それらのコマンドの使い方をコーディングエージェントに教えます。どちらも CLI からインストールでき、プレビュー期間中は頻繁に更新されるため、こまめに最新版を取得してください。
 
-## Steps
+## 手順
 
-### 1. See what's available
+### 1. 使えるものを確認する
 
-Start with the built-in help and the installed tools. The help is authoritative — when your agent gets stuck later, the fastest fix is to have it run `--help` and read the output.
+まずは組み込みのヘルプと、インストール済みのツールから始めます。ヘルプは最も信頼できる情報源です。あとでエージェントが行き詰まったときも、`--help` を実行して出力を読ませるのが最短の解決策になります。
 
 ```bash
 uip --help
 uip tools list --output table
 ```
 
-### 2. Ask the docs with docsai
+### 2. docsai でドキュメントに質問する
 
-`docsai` answers UiPath questions from the terminal, grounded in the documentation.
+`docsai` は、ドキュメントに基づいて UiPath に関する質問にターミナルから答えてくれます。
 
 ```bash
 uip docsai --help
-uip docsai ask "How do I list Orchestrator folders with the UiPath CLI?"
+uip docsai ask "UiPath CLI で Orchestrator のフォルダーを一覧表示するにはどうすればよいですか？"
 ```
 
-### 3. Read from the platform
+### 3. プラットフォームから読み取る
 
-The docsai step likely surfaced this command — go ahead and run it:
+docsai の回答でおそらく次のコマンドが提示されたはずです。実際に実行してみましょう。
 
 ```bash
 uip or folders list
 ```
 
-!!! tip "Let the agent drive"
-    You rarely need to memorize these commands. The point of skills is that you ask for an outcome, for example "list the folders I can publish to", and the agent picks the right uip command. Running a few yourself builds intuition. In repeatable cases, scripted commands also save tokens compared to asking the agent each time.
+!!! tip "エージェントに運転してもらう"
+    これらのコマンドを暗記する必要はほとんどありません。スキルの狙いは、たとえば「公開先にできるフォルダーを一覧表示して」のように結果を伝えるだけで、エージェントが適切な uip コマンドを選んでくれる点にあります。とはいえ、自分でいくつか実行してみると勘所がつかめます。繰り返し実行するケースでは、毎回エージェントに頼むよりスクリプト化したコマンドのほうがトークンの節約にもなります。
 
 
-### 4. Send feedback
+### 4. フィードバックを送る
 
-Coding agents are still in a preview stage, so feedback matters. The easiest way is to ask your coding agent directly — there's a skill that packages the details and sends them to UiPath for you. If something went odd during a session, for example you see agent trying something in loops or retrying multiple times, ask your agent to describe it and use the feedback skill.
+コーディングエージェントはまだプレビュー段階にあるため、フィードバックが重要です。最も簡単なのは、コーディングエージェントに直接頼む方法です。詳細をまとめて UiPath に送信してくれるスキルが用意されています。セッション中に不審な挙動（エージェントが同じ処理をループしている、何度もリトライしているなど）に気づいたら、その内容をエージェントに説明させ、フィードバック用のスキルを使ってもらってください。
 
 ```text
-Send UiPath feedback: the docsai answer for X was incomplete because ...
+UiPath にフィードバックを送ってください: 〇〇に関する docsai の回答は、△△の点が説明されておらず不十分でした。
 ```
 
 ```text
-If you note anything odd during session, for example CLI and skills mismatch or CLI doesn't work as expected, feel free to send that as feedback to UiPath using the send-feedback skill.
+セッション中に気になる挙動（CLI とスキルのバージョン不整合、CLI が想定どおり動かない、など）に気づいたら、send-feedback スキルを使って UiPath にフィードバックとして送ってください。
 ```
 
-Done. You've used the CLI directly, queried the docs, and know how to report issues — everything you need before letting the agent build for you.
+これで完了です。CLI を直接操作し、ドキュメントに問い合わせ、問題を報告する方法を身につけました。エージェントに構築を任せる前に必要な準備はすべて整いました。

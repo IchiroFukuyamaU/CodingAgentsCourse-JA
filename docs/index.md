@@ -1,29 +1,29 @@
-# UiPath Coding Agents Workshop
+# UiPath Coding Agents ワークショップ
 
-**Build UiPath agents and Maestro orchestrations with coding agents — from installing the tools to shipping a long-running automation.**
+**コーディングエージェントを使って UiPath のエージェントと Maestro オーケストレーションを構築します。ツールのインストールから、長時間実行される自動化をリリースするところまでを一気通貫で学びます。**
 
-!!! tip "Training Environment"
-    Log in at **[{{ training_url }}]({{ training_url }})** using tenant **{{ training_tenant }}**.
+!!! tip "トレーニング環境"
+    **[{{ training_url }}]({{ training_url }})** にテナント **{{ training_tenant }}** でログインしてください。
 
-## What you'll build
+## このワークショップで作るもの
 
-This workshop takes you from zero to building real automation with coding agents. You start by setting up the **`uip` CLI** and **UiPath skills**, then build agents and orchestrations — letting a coding agent like **Claude Code** do the heavy lifting while you stay in control.
+本ワークショップでは、ゼロの状態からコーディングエージェントを使った実践的な自動化を構築します。まず **`uip` CLI** と **UiPath スキル** をセットアップし、そのうえでエージェントとオーケストレーションを構築していきます。**Claude Code** のようなコーディングエージェントに面倒な作業を任せつつ、主導権はあなたが握り続けるスタイルです。
 
-The course has two parts:
+コースは 2 部構成です。
 
-**Part 1 · Coding Agents** — get your environment ready, learn how building UiPath components changes with a coding agent, and build your first agents: a low-code hello-world, a coded agent with context and tools, and a conversational agent.
+**Part 1 · Coding Agents** — 環境を整え、コーディングエージェントを使うと UiPath コンポーネントの作り方がどう変わるのかを学び、最初のエージェントを構築します。ローコードの hello-world エージェント、コンテキストとツールを備えたコーデッドエージェント、そして会話型エージェントを扱います。
 
-**Part 2 · Agentic Orchestration** — build Coded Apps, then orchestrate agents and apps into Maestro solutions: Case Management, BPMN, and Flow.
+**Part 2 · Agentic Orchestration** — Coded Apps を構築し、エージェントとアプリを Maestro ソリューション（Case Management、BPMN、Flow）としてオーケストレーションします。
 
-[**Getting Started with Coding Agents**](getting-started/index.md) — Install the `uip` CLI and UiPath skills, explore the CLI, then build and publish your first agent with Claude Code.
+[**コーディングエージェント入門**](getting-started/index.md) — `uip` CLI と UiPath スキルをインストールし、CLI に触れたうえで、Claude Code で最初のエージェントを構築・公開します。
 
-[**Loan Application Underwriting**](loan-application-underwriting/index.md) — Build a complete code-first underwriting pipeline: a Python coded agent, a React coded app, a Maestro flow, and an RPA workflow that assess and route loan applications for UiBank.
+[**ローン審査（Loan Application Underwriting）**](loan-application-underwriting/index.md) — コードファーストの与信審査パイプラインを丸ごと構築します。Python のコーデッドエージェント、React のコーデッドアプリ、Maestro フロー、そして UiBank のローン申込を審査・振り分けする RPA ワークフローを作ります。
 
-More exercises are being authored and will appear here as they are released.
+演習は順次追加され、公開され次第このページに掲載されます。
 
-## Key concepts
+## 主要なコンセプト
 
-- **Coding agent** — an AI assistant (e.g., Claude Code) that builds UiPath components from your instructions, using the `uip` CLI and UiPath skills. UiPath is the automation platform that coding agents operate natively.
-- **`uip` CLI** — the command-line interface coding agents use to talk to the UiPath platform.
-- **UiPath skills** — curated instruction packs that teach a coding agent how to build UiPath automations correctly.
-- **Maestro** — UiPath's orchestration platform for coordinating humans, robots, and AI agents across long-running processes.
+- **コーディングエージェント（Coding agent）** — あなたの指示に従って UiPath のコンポーネントを構築する AI アシスタント（例: Claude Code）です。`uip` CLI と UiPath スキルを使って動作します。UiPath は、コーディングエージェントがネイティブに操作できる自動化プラットフォームです。
+- **`uip` CLI** — コーディングエージェントが UiPath プラットフォームとやり取りするためのコマンドラインインターフェイスです。
+- **UiPath スキル（UiPath skills）** — UiPath の自動化を正しく構築する方法をコーディングエージェントに教える、キュレーション済みの手順パックです。
+- **Maestro** — 長時間実行されるプロセス全体にわたって、人・ロボット・AI エージェントを連携させる UiPath のオーケストレーションプラットフォームです。

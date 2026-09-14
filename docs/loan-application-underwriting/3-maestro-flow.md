@@ -1,95 +1,94 @@
-# Orchestrating with Maestro Flow
-Use the `uipath-maestro-flow` skill to generate a UiPath Flow process that wires the coded agent and the loan officer dashboard together and routes applications by risk band.
+# Maestro Flow によるオーケストレーション
+`uipath-maestro-flow` スキルを使って、コーデッドエージェントとローン担当者用ダッシュボードをつなぎ、リスクバンドに応じて申込を振り分ける UiPath Flow プロセスを生成します。
 
-## 1. Open Your Project Folder in Your Coding Agent
+## 1. プロジェクトフォルダーをコーディングエージェントで開く
 
-Create an empty folder called `{YourName}LoanUnderwritingProcess` and open it in your coding agent (e.g. Claude Code, Codex):
+`{YourName}LoanUnderwritingProcess` という名前の空のフォルダーを作成し、コーディングエージェント（Claude Code、Codex など）で開きます。
 
 ```bash
 mkdir {YourName}LoanUnderwritingProcess
 ```
 
-## 2. Describe the Process
+## 2. プロセスの内容を説明する
 
-Give your coding agent a plain-English description of the full flow:
+フロー全体を、コーディングエージェントに平易な言葉で説明します。
 
 ```text
-Build a UiPath Flow process using the uipath-maestro-flow skill called
-{YourName}LoanUnderwritingProcess. It should:
+uipath-maestro-flow スキルを使って、{YourName}LoanUnderwritingProcess という名前の
+UiPath Flow プロセスを構築してください。要件は次のとおりです:
 
-1. Receive six inputs: loan_id, applicant_first_name, applicant_last_name,
-   loan_amount, loan_term, income
-2. Call the agent {YourName}LoanUnderwritingAgent (in the CodingAgentsILT
-   folder), passing loan_id and storing the returned values as process
-   variables: credit_score, risk_band, assessment_summary,
-   monthly_repayment, debt_to_income_ratio, loan_to_market_ratio
-3. Auto-approve the application and end the process if risk_band is "Low"
-4. For Medium or High risk, open the app {yourname}loanofficerdashboard (in the
-   CodingAgentsILT folder), passing all twelve inputs: LoanId,
-   ApplicantFirstName, ApplicantLastName, LoanAmount, LoanTerm, YearlyIncome,
-   CreditScore, RiskBand, AssessmentSummary, MonthlyRepayment,
-   DebtToIncomeRatio, LoanToMarketRatio — and capturing officer_decision
-5. End with Approved or Rejected based on officer_decision
-6. Output final_decision (string — "Approved" or "Rejected") in all cases,
-   whether the application was auto-approved or decided by the loan officer
+1. 6 つの入力を受け取る: loan_id、applicant_first_name、applicant_last_name、
+   loan_amount、loan_term、income
+2. エージェント {YourName}LoanUnderwritingAgent（CodingAgentsILT フォルダー内）を
+   呼び出し、loan_id を渡して、返された値をプロセス変数として保持する:
+   credit_score、risk_band、assessment_summary、monthly_repayment、
+   debt_to_income_ratio、loan_to_market_ratio
+3. risk_band が "Low" の場合は申込を自動承認してプロセスを終了する
+4. Medium または High の場合は、アプリ {yourname}loanofficerdashboard
+   （CodingAgentsILT フォルダー内）を開き、12 個の入力すべて（LoanId、
+   ApplicantFirstName、ApplicantLastName、LoanAmount、LoanTerm、YearlyIncome、
+   CreditScore、RiskBand、AssessmentSummary、MonthlyRepayment、
+   DebtToIncomeRatio、LoanToMarketRatio）を渡し、officer_decision を受け取る
+5. officer_decision に基づいて Approved または Rejected で終了する
+6. 自動承認された場合もローン担当者が判断した場合も、いずれのケースでも
+   final_decision（string — "Approved" または "Rejected"）を出力する
 ```
 
-Your coding agent reads the `uipath-maestro-flow` skill context and generates a complete project:
+コーディングエージェントは `uipath-maestro-flow` スキルのコンテキストを読み取り、完全なプロジェクトを生成します。
 
-- `{YourName}LoanUnderwritingProcess.flow` — the flow definition with all nodes, edges, and variable mappings
-- `project.uiproj` — project manifest
+- `{YourName}LoanUnderwritingProcess.flow` — すべてのノード、エッジ、変数マッピングを含むフロー定義
+- `project.uiproj` — プロジェクトマニフェスト
 
-## 3. Review the Generated Flow
+## 3. 生成されたフローをレビューする
 
-Open `{YourName}LoanUnderwritingProcess.flow` in your text editor or ask your coding agent to describe the structure. You should see:
+`{YourName}LoanUnderwritingProcess.flow` をテキストエディタで開くか、コーディングエージェントに構造を説明させてください。次の内容が確認できるはずです。
 
-- A **Start node** with six process input variables: `loan_id`, `applicant_first_name`, `applicant_last_name`, `loan_amount`, `loan_term`, `income`
-- An **Agent node** calling `{YourName}LoanUnderwritingAgent` with `loan_id` as input and six output variables: `credit_score`, `risk_band`, `assessment_summary`, `monthly_repayment`, `debt_to_income_ratio`, `loan_to_market_ratio`
-- A **Condition node** branching on `risk_band == "Low"`
-- A **Human Task node** wired to `{yourname}loanofficerdashboard` with all twelve variables mapped as inputs (`LoanId`, `ApplicantFirstName`, `ApplicantLastName`, `LoanAmount`, `LoanTerm`, `YearlyIncome`, `CreditScore`, `RiskBand`, `AssessmentSummary`, `MonthlyRepayment`, `DebtToIncomeRatio`, `LoanToMarketRatio`) and `officer_decision` as output
-- A second **Condition node** branching on `officer_decision == "Approve"`
-- Three **End nodes** — Auto-Approved, Approved, Rejected
+- 6 つのプロセス入力変数（`loan_id`、`applicant_first_name`、`applicant_last_name`、`loan_amount`、`loan_term`、`income`）を持つ **Start ノード**
+- `loan_id` を入力として `{YourName}LoanUnderwritingAgent` を呼び出し、6 つの出力変数（`credit_score`、`risk_band`、`assessment_summary`、`monthly_repayment`、`debt_to_income_ratio`、`loan_to_market_ratio`）を受け取る **Agent ノード**
+- `risk_band == "Low"` で分岐する **Condition ノード**
+- `{yourname}loanofficerdashboard` に接続され、12 個の変数（`LoanId`、`ApplicantFirstName`、`ApplicantLastName`、`LoanAmount`、`LoanTerm`、`YearlyIncome`、`CreditScore`、`RiskBand`、`AssessmentSummary`、`MonthlyRepayment`、`DebtToIncomeRatio`、`LoanToMarketRatio`）がすべて入力としてマッピングされ、`officer_decision` を出力とする **Human Task ノード**
+- `officer_decision == "Approve"` で分岐する 2 つ目の **Condition ノード**
+- 3 つの **End ノード**（Auto-Approved、Approved、Rejected）
 
-If any mapping or condition needs adjusting, ask your coding agent:
+マッピングや条件の調整が必要な場合は、コーディングエージェントに次のように依頼します。
 
 ```text
-Update the risk band condition so the default path goes to the human review
-node and the explicit condition branch handles the "Low" auto-approve case
+リスクバンドの条件を修正して、既定の経路が人的レビューのノードに向かい、明示的な条件分岐のほうで
+"Low" の自動承認ケースを処理するようにしてください。
 ```
 
-!!! tip "Visualise the flow in Studio Web"
-    You can import the generated `.flow` file into **Studio Web** to see a visual diagram of the process and test it interactively — without deploying to Orchestrator first. Open **Studio Web**, create a new Flow project, and import `{YourName}LoanUnderwritingProcess.flow`. The canvas will render all nodes, conditions, and connections exactly as the coding agent generated them.
+!!! tip "Studio Web でフローを可視化する"
+    生成された `.flow` ファイルは **Studio Web** にインポートでき、Orchestrator にデプロイする前にプロセスの図を確認したり、対話的にテストしたりできます。**Studio Web** を開いて新しい Flow プロジェクトを作成し、`{YourName}LoanUnderwritingProcess.flow` をインポートしてください。コーディングエージェントが生成したとおりのノード、条件、接続がキャンバスに描画されます。
 
-## 4. Test the Generated Flow
+## 4. 生成されたフローをテストする
 
-Ask your coding agent to fetch a verified loan record from UiBank and generate valid test input for the flow:
+UiBank から検証済みのローンレコードを取得し、フロー用の有効なテスト入力を生成するよう、コーディングエージェントに依頼します。
 
 ```text
-Open and inspect the UiBank Swagger documentation:
+UiBank の Swagger ドキュメントを開いて内容を確認してください:
 
 https://uibank-api.uipath.com/explorer/swagger.json
 
-Using only endpoints documented by the API, identify the read-only endpoint for
-retrieving loan quotes. Make a GET request and select one loan quote that
-currently exists in UiBank.
+API に記載されているエンドポイントのみを使い、ローン見積を取得するための読み取り専用エンドポイントを
+特定してください。GET リクエストを実行し、現在 UiBank に存在するローン見積を 1 件選んでください。
 
-Use the verified loan record to generate test input for the
-{YourName}LoanUnderwritingProcess Flow.
+検証済みのローンレコードを使って、{YourName}LoanUnderwritingProcess フロー用のテスト入力を
+生成してください。
 
-Requirements:
-- Use only GET endpoints documented in the Swagger specification.
-- Do not create, update, or delete any data.
-- Do not invent or reuse an unverified loan_id.
-- Verify that the selected loan record exists.
-- Populate loan_amount, loan_term, and income from the same verified record.
-- loan_term represents years and must be one of: 1, 3, 5, or 10.
-- Map the record's yearly income to income.
-- Use applicant names from the record when available. If the API does not provide
-  applicant names, use the workshop-safe values John and Doe.
-- Return exactly one valid JSON object.
-- Do not include Markdown, explanations, comments, or a PowerShell command.
+要件:
+- Swagger 仕様に記載された GET エンドポイントのみを使用すること。
+- データの作成・更新・削除は一切行わないこと。
+- loan_id を捏造したり、存在を確認していない ID を使い回したりしないこと。
+- 選んだローンレコードが実在することを検証すること。
+- loan_amount、loan_term、income は同一の検証済みレコードから設定すること。
+- loan_term は年数を表し、1、3、5、10 のいずれかでなければならない。
+- レコードの年収を income にマッピングすること。
+- 申込者名はレコードにあればそれを使用すること。API が申込者名を提供しない場合は、
+  ワークショップ用の安全な値として John と Doe を使用すること。
+- 有効な JSON オブジェクトをちょうど 1 つだけ返すこと。
+- Markdown、説明、コメント、PowerShell コマンドは含めないこと。
 
-Required output format:
+必須の出力形式:
 
 {
   "loan_id": "<VERIFIED_LOAN_ID>",
@@ -101,7 +100,7 @@ Required output format:
 }
 ```
 
-Your coding agent should return something like:
+コーディングエージェントは次のような結果を返すはずです。
 
 ```json
 {
@@ -114,109 +113,109 @@ Your coding agent should return something like:
 }
 ```
 
-## 5. Validate and Pack
+## 5. 検証とパック
 
-=== "Manually"
+=== "手動で行う場合"
 
-    Navigate to the parent folder of the generated `.flow` file:
+    生成された `.flow` ファイルの親フォルダーに移動します。
 
     ```bash
     cd "parent-folder-path/to/{YourName}LoanUnderwritingProcess"
     ```
 
-    Replace the path with the actual location on your machine.
+    パスは、お使いのマシン上の実際の場所に置き換えてください。
 
-    Validate the flow before packing:
+    パックする前に、フローを検証します。
 
     ```bash
     uip maestro flow validate {YourName}LoanUnderwritingProcess.flow
     ```
 
-    If you get a command not found error, the maestro tool may not be installed or on your PATH:
+    command not found エラーが出る場合は、maestro ツールが未インストールか、PATH に入っていない可能性があります。
 
     ```bash
-    # 1. Install maestro-tool (only needed once)
+    # 1. maestro-tool をインストールする（初回のみ）
     npm install -g @uipath/maestro-tool --prefix "$HOME/.npm-global"
 
-    # 2. Add it to PATH (needed each new terminal, or add to ~/.zshrc permanently)
+    # 2. PATH に追加する（新しいターミナルごとに必要。~/.zshrc に書けば恒久的）
     export PATH="$HOME/.npm-global/bin:$PATH"
 
-    # To avoid step 2 every time, run this once:
+    # 毎回手順 2 を実行しなくて済むよう、次を一度だけ実行しておく:
     echo 'export PATH="$HOME/.npm-global/bin:$PATH"' >> ~/.zshrc
 
-    # 3. Validate
+    # 3. 検証する
     uip maestro flow validate {YourName}LoanUnderwritingProcess.flow
     ```
 
-    Fix any warnings, then pack:
+    警告があれば修正し、そのうえでパックします。
 
     ```bash
     uip maestro flow pack "<path-to-your-flow-folder>/{YourName}LoanUnderwritingProcess" /tmp/dist --version 1.0.0 --output json
     ```
 
-    For example:
+    例:
 
     ```bash
     uip maestro flow pack "/path/to/{YourName}LoanUnderwritingProcess/{YourName}LoanUnderwritingProcess" /tmp/dist --version 1.0.0 --output json
     ```
 
-    Upload the package to Orchestrator and create a process in the `CodingAgentsILT` folder:
+    パッケージを Orchestrator にアップロードし、`CodingAgentsILT` フォルダーにプロセスを作成します。
 
     ```bash
     uip or packages upload /tmp/dist/{YourName}LoanUnderwritingProcess.flow.Flow.1.0.0.nupkg --output json
     ```
 
-    For example:
+    例:
 
     ```bash
     uip or packages upload /tmp/dist/MadalinaLoanUnderwritingProcess.flow.Flow.1.0.0.nupkg --output json
     ```
 
-    If you get a command not found error, the maestro tool may not be installed or on your PATH:
+    command not found エラーが出る場合は、maestro ツールが未インストールか、PATH に入っていない可能性があります。
 
     ```bash
-    # 1. Install maestro-tool (only needed once)
+    # 1. maestro-tool をインストールする（初回のみ）
     npm install -g @uipath/maestro-tool --prefix "$HOME/.npm-global"
 
-    # 2. Add it to PATH (needed each new terminal, or add to ~/.zshrc permanently)
+    # 2. PATH に追加する（新しいターミナルごとに必要。~/.zshrc に書けば恒久的）
     export PATH="$HOME/.npm-global/bin:$PATH"
 
-    # To avoid step 2 every time, run this once:
+    # 毎回手順 2 を実行しなくて済むよう、次を一度だけ実行しておく:
     echo 'export PATH="$HOME/.npm-global/bin:$PATH"' >> ~/.zshrc
 
-    # 3. Retry the upload
+    # 3. アップロードを再実行する
     uip or packages upload /tmp/dist/{YourName}LoanUnderwritingProcess.flow.Flow.1.0.0.nupkg --output json
     ```
 
-    Then create the process:
+    そのうえでプロセスを作成します。
 
     ```bash
     uip or processes create --name "{YourName}LoanUnderwritingProcess" --package-key "{YourName}LoanUnderwritingProcess.flow.Flow" --package-version "1.0.0" --folder-key "c30345cd-5543-46a9-b42b-0354e60b4f15" --output json
     ```
 
-    For example:
+    例:
 
     ```bash
     uip or processes create --name "MadalinaLoanUnderwritingProcess" --package-key "MadalinaLoanUnderwritingProcess.flow.Flow" --package-version "1.0.0" --folder-key "c30345cd-5543-46a9-b42b-0354e60b4f15" --output json
     ```
 
-=== "Using Your Coding Agent"
+=== "コーディングエージェントに任せる場合"
 
-    Give this prompt to your coding agent — it validates, publishes, and deploys the flow for you:
+    次のプロンプトをコーディングエージェントに渡してください。検証・公開・デプロイまでを代行してくれます。
 
     ```text
-    Publish and deploy the {YourName}LoanUnderwritingProcess Maestro flow I just built.
+    いま構築した {YourName}LoanUnderwritingProcess の Maestro フローを公開してデプロイしてください。
 
-    1. Find the generated .flow file and validate it, fixing any warnings it reports.
-    2. Publish it to Orchestrator, into the CodingAgentsILT folder
-       (folder-key c30345cd-5543-46a9-b42b-0354e60b4f15), as version 1.0.0.
-    3. Deploy it by creating a process from the published package in that same folder.
-    4. Report back the process key.
+    1. 生成された .flow ファイルを見つけて検証し、報告された警告があれば修正してください。
+    2. Orchestrator の CodingAgentsILT フォルダー
+       （folder-key c30345cd-5543-46a9-b42b-0354e60b4f15）に、バージョン 1.0.0 として公開してください。
+    3. 同じフォルダー内で、公開したパッケージからプロセスを作成してデプロイしてください。
+    4. プロセスキーを報告してください。
     ```
 
-## 6. Test the Full Flow
+## 6. フロー全体をテストする
 
-Trigger the process from Orchestrator three times — once per applicant below. Each `loan_id` is a real, verified record in UiBank (the agent re-fetches and scores off this record, so the amount/term/income below match it exactly):
+Orchestrator からプロセスを 3 回起動します。下記の申込者ごとに 1 回ずつです。各 `loan_id` は UiBank に実在する検証済みのレコードです（エージェントはこのレコードを再取得してスコアリングするため、下記の金額・期間・収入はレコードの内容と一致しています）。
 
 ```json
 {"loan_id": "6a8dabd21feca3004834197a", "applicant_first_name": "Alice", "applicant_last_name": "Nguyen", "loan_amount": 25001, "loan_term": 3, "income": 80000}
@@ -230,15 +229,15 @@ Trigger the process from Orchestrator three times — once per applicant below. 
 {"loan_id": "6a8db0e11feca30048341981", "applicant_first_name": "Clara", "applicant_last_name": "Osei", "loan_amount": 12000, "loan_term": 10, "income": 1200}
 ```
 
-These IDs point to live records in the shared UiBank sandbox — verified to exist at the time this lesson was written, and chosen so the debt-to-income ratio clearly separates each band: Alice ~10% (Low), Ben ~40% (Medium), Clara ~100% (High). If UiBank's data is ever reset, look up 3 fresh records with a similarly clear spread using the swagger lookup from step 4 — since scoring is LLM-driven, always re-run and confirm the resulting `risk_band` before relying on a new record.
+これらの ID は共有の UiBank サンドボックス上の実データを指しており、本レッスン作成時点で実在が確認されています。また、債務所得比率によって各バンドがはっきり分かれるように選ばれています（Alice 約 10%（Low）、Ben 約 40%（Medium）、Clara 約 100%（High））。UiBank のデータがリセットされた場合は、手順 4 の Swagger による検索を使って、同様に差がはっきり出る新しいレコードを 3 件探してください。スコアリングは LLM によるものなので、新しいレコードを使う前には必ず再実行して、得られた `risk_band` を確認してください。
 
-| Applicant | Expected path |
+| 申込者 | 想定される経路 |
 |---|---|
-| Alice — low loan, solid income | Low risk → auto-approved, no human task |
-| Ben — large loan, high term | Medium risk → human task opens in Action Center |
-| Clara — young age, tight income | High risk → human task opens in Action Center |
+| Alice — 少額のローン、十分な収入 | 低リスク → 自動承認、人的タスクなし |
+| Ben — 高額のローン、長い借入期間 | 中リスク → Action Center に人的タスクが発生 |
+| Clara — 若年、収入が厳しい | 高リスク → Action Center に人的タスクが発生 |
 
-For Ben and Clara, open **Action Center** while the process is paused. The loan officer dashboard should appear with the credit score and risk band pre-filled. Submit a decision and watch the flow route to the matching end state.
+Ben と Clara については、プロセスが一時停止している間に **Action Center** を開いてください。クレジットスコアとリスクバンドがあらかじめ入力された状態で、ローン担当者用ダッシュボードが表示されるはずです。判断を送信し、フローが対応する終了状態へ進むことを確認しましょう。
 
-!!! tip "Watch the execution trace"
-    In Orchestrator, click into a running flow instance to see the live diagram with the active node highlighted. This is the fastest way to confirm routing is correct at each condition.
+!!! tip "実行トレースを確認する"
+    Orchestrator では、実行中のフローインスタンスをクリックすると、アクティブなノードがハイライトされたライブの図を確認できます。各条件分岐が正しく振り分けられているかを確かめるには、これが最速の方法です。

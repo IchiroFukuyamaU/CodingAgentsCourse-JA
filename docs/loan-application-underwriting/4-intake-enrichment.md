@@ -1,151 +1,150 @@
-# Application Intake & Enrichment
-Use the `uipath-rpa` skill to generate a Studio XAML workflow that reads applicant data from a CSV, submits each loan application through the UiBank API, and writes the results to `results.csv`.
+# 申込受付とデータ補完
+`uipath-rpa` スキルを使って、CSV から申込者データを読み込み、各ローン申込を UiBank API 経由で送信し、結果を `results.csv` に書き出す Studio の XAML ワークフローを生成します。
 
-## 1. Open Your Project Folder in Your Coding Agent
+## 1. プロジェクトフォルダーをコーディングエージェントで開く
 
-Create an empty folder called `LoanApplicationDispatcher` and open it in your coding agent (e.g. Claude Code, Codex):
+`LoanApplicationDispatcher` という名前の空のフォルダーを作成し、コーディングエージェント（Claude Code、Codex など）で開きます。
 
 ```bash
 mkdir LoanApplicationDispatcher
 ```
 
-## 2. Describe the Automation
+## 2. 自動化の内容を説明する
 
-Give your coding agent a plain-English description of what to build:
+作りたいものを、コーディングエージェントに平易な言葉で説明します。
 
 ```text
-Build a UiPath Studio automation called {YourName}LoanApplicationDispatcher that:
+次の処理を行う {YourName}LoanApplicationDispatcher という名前の UiPath Studio の自動化を構築してください:
 
-1. Reads loan-applications.csv into a DataTable with columns: first_name,
-   last_name, email, loan_amount, loan_term, yearly_income, age
-2. For each row, submits a loan application to the UiBank API
-   (https://uibank-api.uipath.com/explorer/swagger.json, no authentication
-   required) via the newquote endpoint — POST request with Content-Type
-   application/x-www-form-urlencoded, mapping: loan_amount → amount,
-   loan_term → term, yearly_income → income, age → age, email → email
-3. If the application is accepted, writes a row to {YourName}results.csv with loan_id
-   (the quoteid from the response), status "Loan Submitted", and all applicant
-   fields — then starts the flow process {YourName}LoanUnderwritingProcess in the
-   CodingAgentsILT folder, passing loan_id, applicant_first_name, applicant_last_name,
-   loan_amount, loan_term, and income as inputs. Once it completes,
-   updates the status in {YourName}results.csv to "Loan Approved" or "Loan Rejected"
-   based on final_decision
-4. If the application is rejected, writes a row to {YourName}results.csv with an empty
-   loan_id, status "Failed", and error "Application rejected"
-5. Wraps each row in a Try/Catch — on exception, writes a row to {YourName}results.csv
-   with empty loan_id, status "Failed", and the exception message
-6. After all rows are processed, uploads {YourName}results.csv to the LoanUnderwriting
-   storage bucket in the CodingAgentsILT folder in Orchestrator
+1. loan-applications.csv を DataTable に読み込む。列は first_name、last_name、email、
+   loan_amount、loan_term、yearly_income、age
+2. 各行について、UiBank API（https://uibank-api.uipath.com/explorer/swagger.json、
+   認証不要）の newquote エンドポイントにローン申込を送信する。Content-Type は
+   application/x-www-form-urlencoded の POST リクエストとし、次のようにマッピングする:
+   loan_amount → amount、loan_term → term、yearly_income → income、age → age、
+   email → email
+3. 申込が受理された場合は、{YourName}results.csv に 1 行を書き込む。内容は loan_id
+   （レスポンスの quoteid）、ステータス "Loan Submitted"、および申込者の全フィールド。
+   そのうえで、CodingAgentsILT フォルダー内のフロープロセス {YourName}LoanUnderwritingProcess を
+   開始し、loan_id、applicant_first_name、applicant_last_name、loan_amount、loan_term、
+   income を入力として渡す。プロセスが完了したら、final_decision に基づいて
+   {YourName}results.csv のステータスを "Loan Approved" または "Loan Rejected" に更新する
+4. 申込が却下された場合は、loan_id を空、ステータスを "Failed"、エラーを
+   "Application rejected" として {YourName}results.csv に 1 行を書き込む
+5. 各行の処理を Try/Catch で囲む。例外が発生した場合は、loan_id を空、ステータスを
+   "Failed"、例外メッセージをエラーとして {YourName}results.csv に 1 行を書き込む
+6. すべての行の処理が終わったら、{YourName}results.csv を Orchestrator の
+   CodingAgentsILT フォルダー内の LoanUnderwriting ストレージバケットにアップロードする
 
-Create this as a cross-platform project (not Windows). Only generate the
-project files.
+このプロジェクトはクロスプラットフォーム（Windows 用ではなく）として作成してください。
+生成するのはプロジェクトファイルのみで構いません。
 ```
 
-Your coding agent reads the `uipath-rpa` skill context and generates a complete Studio project:
+コーディングエージェントは `uipath-rpa` スキルのコンテキストを読み取り、完全な Studio プロジェクトを生成します。
 
-- `Main.xaml` — the main workflow with API authentication, ForEach loop, HTTP requests, and CSV output
-- `project.json` — project configuration and activity package dependencies
+- `Main.xaml` — API 認証、ForEach ループ、HTTP リクエスト、CSV 出力を含むメインのワークフロー
+- `project.json` — プロジェクト設定とアクティビティパッケージの依存関係
 
-## 3. Review the Generated Workflow
+## 3. 生成されたワークフローをレビューする
 
-Open `Main.xaml` in Studio. You should see:
+Studio で `Main.xaml` を開きます。次の内容が確認できるはずです。
 
-- **Read CSV** — reads `loan-applications.csv` into a DataTable
-- **For Each Row in Data Table** — loops over each applicant
-  - **HTTP Request** — POST to `/api/quotes/newquote` with form-encoded fields (amount, term, income, age, email)
-  - **Deserialize JSON** — parses the response to extract `accepted` and `quoteid`
-  - **If** — branches on `accepted`
-  - **Append Line / Write CSV** — appends the result row to `results.csv`
-- **Try/Catch** — wraps each row to handle failures without stopping the whole run
+- **Read CSV** — `loan-applications.csv` を DataTable に読み込む
+- **For Each Row in Data Table** — 申込者ごとにループする
+  - **HTTP Request** — `/api/quotes/newquote` に対して、フォームエンコードされたフィールド（amount、term、income、age、email）で POST する
+  - **Deserialize JSON** — レスポンスを解析して `accepted` と `quoteid` を取り出す
+  - **If** — `accepted` で分岐する
+  - **Append Line / Write CSV** — 結果の行を `results.csv` に追記する
+- **Try/Catch** — 各行を囲み、失敗しても実行全体が止まらないようにする
 
-!!! note "Check the Start Job entry point"
-    Find the **Start Job** activity that triggers `{YourName}LoanUnderwritingProcess`. Verify that the process name and folder path are set correctly — they should match exactly what you deployed in Lesson 3. If the entry point path is wrong, the job will fail to start.
+!!! note "Start Job のエントリーポイントを確認してください"
+    `{YourName}LoanUnderwritingProcess` を起動する **Start Job** アクティビティを探し、プロセス名とフォルダーパスが正しく設定されているか確認してください。レッスン 3 でデプロイした内容と完全に一致している必要があります。エントリーポイントのパスが誤っていると、ジョブの開始に失敗します。
 
-If the HTTP Request activity is not correctly setting the form body, ask your coding agent to fix it:
+HTTP Request アクティビティがフォームのボディを正しく設定していない場合は、コーディングエージェントに修正を依頼します。
 
 ```text
-The HTTP Request for /api/quotes/newquote should use Content-Type
-application/x-www-form-urlencoded with form fields, not a JSON body.
-Update the activity accordingly.
+/api/quotes/newquote への HTTP Request は、JSON ボディではなく、Content-Type
+application/x-www-form-urlencoded のフォームフィールドを使う必要があります。
+アクティビティを修正してください。
 ```
 
-## 4. Before You Run
+## 4. 実行する前に
 
-Make sure `loan-applications.csv` is in the project folder. If you haven't created it yet, you can ask your coding agent to generate it using this sample data:
+`loan-applications.csv` がプロジェクトフォルダーにあることを確認してください。まだ作成していない場合は、次のサンプルデータを使ってコーディングエージェントに生成してもらえます。
 
 ```text
-Create a file called loan-applications.csv in the current folder using this data:
+次のデータを使って、カレントフォルダーに loan-applications.csv というファイルを作成してください:
 
 first_name,last_name,email,loan_amount,loan_term,yearly_income,age
 Alice,Nguyen,alice.nguyen@example.com,15000,3,48000,34
 Ben,Carter,ben.carter@example.com,50000,5,30000,40
 Clara,Osei,clara.osei@example.com,70000,5,28000,29
 
-Replace first_name, last_name, and email for each row with different values —
-use your own name or make them up, as long as they are not the same as the
-ones above. Keep loan_amount, loan_term, yearly_income, and age unchanged.
+各行の first_name、last_name、email は、上記とは異なる値に置き換えてください。
+自分の名前を使っても、架空の値を作っても構いませんが、上記と同じにはしないでください。
+loan_amount、loan_term、yearly_income、age は変更せずそのまま残してください。
 ```
 
-## 5. Run and Test
+## 5. 実行してテストする
 
-Open the project in Studio and run `Main.xaml`. Watch the Output panel as the workflow authenticates and submits each application via the API. Then verify:
+Studio でプロジェクトを開き、`Main.xaml` を実行します。ワークフローが認証を行い、各申込を API 経由で送信していく様子を Output パネルで確認してください。そのうえで、次を検証します。
 
-- **`results.csv`** — open the file and confirm three rows appear, each with a `loan_id` and a status of `Loan Approved` or `Loan Rejected`
+- **`results.csv`** — ファイルを開き、3 行が出力されていること、各行に `loan_id` があり、ステータスが `Loan Approved` または `Loan Rejected` になっていることを確認します
 
-## 6. Publish to Orchestrator
+## 6. Orchestrator に公開する
 
-=== "Manually"
+=== "手動で行う場合"
 
-    First, create a `Package` folder next to your project folder — not inside it. Replace `<working-folder>` with the parent folder that contains `{YourName}LoanApplicationDispatcher`:
+    まず、プロジェクトフォルダーの *中ではなく* **隣** に `Package` フォルダーを作成します。`<working-folder>` は `{YourName}LoanApplicationDispatcher` を含む親フォルダーに置き換えてください。
 
     ```bash
     mkdir "<working-folder>\Package"
     ```
 
-    Your folder structure should look like this:
+    フォルダー構成は次のようになります。
 
     ```text
     <working-folder>\
-        {YourName}LoanApplicationDispatcher\   ← the Studio project
-        Package\                    ← where the .nupkg will be saved
+        {YourName}LoanApplicationDispatcher\   ← Studio のプロジェクト
+        Package\                    ← .nupkg の保存先
     ```
 
-    Then pack the project into a `.nupkg` file:
+    続いて、プロジェクトを `.nupkg` ファイルにパックします。
 
     ```bash
     uip rpa pack "<working-folder>\{YourName}LoanApplicationDispatcher" "<working-folder>\Package"
     ```
 
-    The packed `.nupkg` file will appear inside the `Package` folder. Upload it to Orchestrator:
+    パックされた `.nupkg` ファイルが `Package` フォルダー内に生成されます。これを Orchestrator にアップロードします。
 
     ```bash
     uip or packages upload "<working-folder>\Package\{YourName}LoanApplicationDispatcher.1.0.0.nupkg"
     ```
 
-    Then create a process from the uploaded package:
+    そのうえで、アップロードしたパッケージからプロセスを作成します。
 
     ```bash
     uip or processes create --folder-path "CodingAgentsILT" --name "{YourName}LoanApplicationDispatcher" --package-key {YourName}LoanApplicationDispatcher --package-version 1.0.0
     ```
 
-=== "Using Your Coding Agent"
+=== "コーディングエージェントに任せる場合"
 
-    Give this prompt to your coding agent — it packs, uploads, and creates the process for you:
+    次のプロンプトをコーディングエージェントに渡してください。パック、アップロード、プロセスの作成までを代行してくれます。
 
     ```text
-    Publish and create an Orchestrator process for the {YourName}LoanApplicationDispatcher
-    Studio automation I just built.
+    いま構築した {YourName}LoanApplicationDispatcher の Studio 自動化を公開し、
+    Orchestrator のプロセスを作成してください。
 
-    1. Pack the project into a .nupkg (using a Package folder next to the project,
-       not inside it).
-    2. Upload the resulting package to Orchestrator.
-    3. Create a process from that package in the CodingAgentsILT folder, using the
-       same name as the project.
-    4. Report back the process key.
+    1. プロジェクトを .nupkg にパックしてください（プロジェクトの中ではなく、隣に置いた
+       Package フォルダーを使用すること）。
+    2. 生成されたパッケージを Orchestrator にアップロードしてください。
+    3. そのパッケージから、CodingAgentsILT フォルダー内に、プロジェクトと同じ名前で
+       プロセスを作成してください。
+    4. プロセスキーを報告してください。
     ```
 
-## 7. Run Your End-to-End Loan Application Underwriting
+## 7. ローン審査をエンドツーエンドで実行する
 
-In **Orchestrator**, navigate to your **CodingAgentsILT** folder, open `{YourName}LoanApplicationDispatcher`, and start a run to trigger it manually.
+**Orchestrator** で **CodingAgentsILT** フォルダーを開き、`{YourName}LoanApplicationDispatcher` を選択して、手動で実行を開始します。
 
-Watch it submit each application from `loan-applications.csv`, start the Maestro flow for every accepted one, and route results back — for Medium and High-risk applications, open **Action Center** and complete the human review task. Once the run finishes, open `results.csv` and confirm every row shows a final status of Loan Approved or Loan Rejected.
+`loan-applications.csv` の各申込が送信され、受理されたものについて Maestro フローが開始され、結果が返ってくる様子を確認してください。中リスク・高リスクの申込については、**Action Center** を開いて人的レビューのタスクを完了させます。実行が完了したら `results.csv` を開き、すべての行の最終ステータスが Loan Approved または Loan Rejected になっていることを確認してください。

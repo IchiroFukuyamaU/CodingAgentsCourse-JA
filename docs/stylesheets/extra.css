@@ -1,13 +1,43 @@
 /* UiPath brand fonts */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@600;700&display=swap');
 
+/* ── 日本語フォント（Meiryo UI）─────────────────────────────────────────────
+   欧文は UiPath ブランドの Inter / Nunito を維持し、日本語グリフのみ
+   Meiryo UI で表示されるようフォントスタックを構成しています。
+   Meiryo UI は Windows 標準フォントのため、macOS / Linux 向けに
+   ヒラギノ角ゴ・Noto Sans JP をフォールバックとして指定します。      */
+:root {
+  --jp-font-stack: 'Meiryo UI', 'Meiryo', 'メイリオ',
+                   'Hiragino Kaku Gothic ProN', 'Hiragino Sans',
+                   'Yu Gothic UI', 'Noto Sans JP', 'Noto Sans CJK JP', sans-serif;
+
+  --md-text-font-family: 'Inter', var(--jp-font-stack);
+  --md-code-font-family: 'Roboto Mono', 'Meiryo UI', 'Consolas', 'Menlo', monospace;
+}
+
 .md-typeset h1,
 .md-typeset h2,
 .md-typeset h3,
 .md-typeset h4,
 .md-typeset h5,
 .md-typeset h6 {
-  font-family: 'Nunito', sans-serif;
+  font-family: 'Nunito', var(--jp-font-stack);
+}
+
+/* 日本語は字面が大きいため、行間をやや広めに取って可読性を確保 */
+.md-typeset {
+  line-height: 1.75;
+}
+
+.md-typeset li {
+  line-height: 1.75;
+}
+
+/* 日本語の見出しは字間を詰めない（Nunito 由来の負トラッキングを打ち消す） */
+.md-typeset h1,
+.md-typeset h2,
+.md-typeset h3 {
+  letter-spacing: 0;
 }
 
 /* UiPath Robotic Orange — override Material primary color */
@@ -29,7 +59,7 @@
 .md-header__topic,
 .md-ellipsis {
   color: #1a1a1a;
-  font-family: 'Nunito', sans-serif;
+  font-family: 'Nunito', var(--jp-font-stack);
 }
 
 .md-header__button,
@@ -204,13 +234,13 @@ img + em {
 /* Top-level navigation tabs — 20% larger than Material default (0.7rem) */
 .md-tabs__link {
   font-size: 0.84rem;
-  font-family: 'Nunito', sans-serif;
+  font-family: 'Nunito', var(--jp-font-stack);
 }
 
-/* Left sidebar navigation — explicit Inter (inherits body font, but made explicit) */
+/* Left sidebar navigation — explicit Inter + Meiryo UI (inherits body font, but made explicit) */
 .md-nav__link,
 .md-nav__title {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Inter', var(--jp-font-stack);
 }
 
 /* Code blocks — 10% smaller font, wrap long lines */

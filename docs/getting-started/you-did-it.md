@@ -1,49 +1,49 @@
-# You did it!
+# 完了です！
 
-!!! tip "Congratulations!"
+!!! tip "おめでとうございます！"
 
-    You've set up the UiPath CLI and skills, driven the platform from your terminal, and built and published your first agent.
+    UiPath CLI とスキルをセットアップし、ターミナルからプラットフォームを操作し、最初のエージェントを構築・公開しました。
 
-## What you built
+## 構築したもの
 
-You have a working coding-agent environment — the `uip` CLI authenticated to your tenant and the UiPath skills loaded into your agent — and you've completed the full **build → publish → run** loop once with a simple Claims Eligibility agent.
+コーディングエージェントの実行環境が整いました。`uip` CLI がテナントに対して認証済みで、UiPath スキルがエージェントに読み込まれています。そのうえで、シンプルな Claims Eligibility エージェントを題材に **構築 → 公開 → 実行** のループを 1 周完了しました。
 
-| Component | Role |
+| コンポーネント | 役割 |
 |-----------|------|
-| **UiPath CLI** (`uip`) | The interface your coding agent uses to talk to the platform |
-| **UiPath skills** | Instruction packs that teach the agent when and how to use the CLI |
-| **docsai** | Answers UiPath questions from the terminal, grounded in the docs |
-| **Your first agent** | A low-code agent you generated, published, and ran in Studio Web |
+| **UiPath CLI**（`uip`） | コーディングエージェントがプラットフォームとやり取りするためのインターフェイス |
+| **UiPath スキル** | CLI をいつ・どのように使うのかをエージェントに教える手順パック |
+| **docsai** | ドキュメントに基づいて、UiPath に関する質問にターミナルから回答 |
+| **最初のエージェント** | 自分で生成し、Studio Web に公開して実行したローコードエージェント |
 
-## Next steps
+## 次のステップ
 
-### 1. Keep your setup current
+### 1. 環境を最新に保つ
 
-During preview, skills and tools change often, probably daily. Refresh them now and then:
+プレビュー期間中、スキルとツールは頻繁に（おそらく毎日）更新されます。ときどき更新してください。
 
 ```bash
 uip skills update --agent claude
 uip tools update
 ```
 
-### 2. Build a real agent
+### 2. 実用的なエージェントを作る
 
-You've done the loop once with a simple agent. In the next exercise you'll build a richer one — adding context and tools so the agent can reason over grounded data and take real actions.
+シンプルなエージェントでループを 1 周しました。次の演習では、コンテキストとツールを追加し、グラウンディングされたデータに基づいて推論し、実際にアクションを起こせる、より本格的なエージェントを構築します。
 
-## Keep iterating
+## さらに磨きをかけるために
 
-**Ask for outcomes, not commands**
+**コマンドではなく「やりたいこと」を伝える**
 
-- Describe what you want done and let the agent choose the commands. Build the habit now.
+- 何をしてほしいかを説明し、コマンドの選択はエージェントに任せましょう。いまのうちにこの習慣を身につけてください。
 
-**Trust the model**
+**モデルを信頼する**
 
-- Don't over-optimize for tokens early. A stronger model often costs less because it makes fewer mistakes. Use it, and your intuition will follow.
+- 序盤からトークンの最適化にこだわりすぎないようにしましょう。性能の高いモデルはミスが少ないため、結果的に安く済むことがよくあります。まずは使ってみると、感覚がつかめてきます。
 
-## Learn more
+## もっと詳しく
 
-| Resource | Description |
-|----------|-------------|
-| [Using UiPath CLI with Coding Agents](https://docs.uipath.com/uipath-cli/standalone/latest/user-guide/coding-agents) | Per-agent setup walkthroughs |
-| [uip skills reference](https://docs.uipath.com/uipath-cli/standalone/latest/user-guide/uip-skills) | Full command and flag reference |
-| [UiPath/skills (GitHub)](https://github.com/uipath/skills) | The source of the UiPath skills |
+| リソース | 説明 |
+|----------|------|
+| [Using UiPath CLI with Coding Agents](https://docs.uipath.com/uipath-cli/standalone/latest/user-guide/coding-agents) | エージェント別のセットアップ手順 |
+| [uip skills リファレンス](https://docs.uipath.com/uipath-cli/standalone/latest/user-guide/uip-skills) | コマンドとフラグの完全なリファレンス |
+| [UiPath/skills（GitHub）](https://github.com/uipath/skills) | UiPath スキルのソース |

@@ -1,74 +1,74 @@
-# Installing the CLI and Skills
+# CLI とスキルのインストール
 
-!!! tip "Here is our plan for this lesson:"
+!!! tip "このレッスンの進め方"
 
-    1. Install the **UiPath CLI** and sign in.
-    2. Add the **UiPath skills** to your coding agent.
-    3. Verify that your agent recognizes UiPath tasks.
+    1. **UiPath CLI** をインストールしてサインインします。
+    2. **UiPath スキル** をコーディングエージェントに追加します。
+    3. エージェントが UiPath のタスクを認識することを確認します。
 
-## Goal
+## ゴール
 
-By the end of this lesson you'll have a working setup: the `uip` CLI installed and authenticated, the UiPath skills added, and a quick check that proves your agent knows how to build with UiPath. This is the foundation for every other exercise.
+このレッスンを終えると、動作する開発環境が手に入ります。`uip` CLI がインストール・認証済みで、UiPath スキルが追加され、エージェントが UiPath での構築方法を理解していることを簡単なチェックで確認できている状態です。これがほかのすべての演習の土台になります。
 
-## Why a coding agent changes how you build
+## コーディングエージェントが「作り方」をどう変えるのか
 
-A coding agent already knows how to write code. What it doesn't know is UiPath — your CLI commands, project structures, and platform conventions. Two pieces fix that:
+コーディングエージェントは、コードの書き方はすでに知っています。知らないのは UiPath のこと、つまり CLI コマンド、プロジェクト構造、プラットフォーム固有の作法です。それを埋めるのが次の 2 つです。
 
-- **UiPath CLI** is the interface the agent uses to talk to the platform. A command-line interface turned out to be the most token-efficient way to expose UiPath to an agent.
-- **Skills** are how you teach the agent to use that CLI well. They encode the *sequence* of commands for a task, so you can ask for an outcome instead of memorizing commands.
+- **UiPath CLI** は、エージェントがプラットフォームと会話するためのインターフェイスです。エージェントに UiPath を提供する方法として、コマンドラインインターフェイスが最もトークン効率の良い形だと分かってきました。
+- **スキル** は、その CLI を上手に使う方法をエージェントに教える仕組みです。タスクごとにコマンドの *手順* が記述されているため、コマンドを覚える代わりに「やりたいこと」を伝えるだけで済みます。
 
-One idea worth holding onto: building is only a small part of the work. The agent gets you to a result quickly, but the platform is what keeps that result running, governed, and observable in production. You build at the edges; UiPath handles the infrastructure underneath.
+覚えておく価値のある考え方が 1 つあります。「作ること」は仕事のごく一部にすぎない、ということです。エージェントは結果までの距離を一気に縮めてくれますが、その結果を本番で動かし続け、ガバナンスを効かせ、可観測性を保つのはプラットフォームの役割です。あなたは末端を作り、その下のインフラは UiPath が引き受けます。
 
-## Steps
+## 手順
 
-### 1. Install the UiPath CLI
+### 1. UiPath CLI をインストールする
 
-Install the CLI globally. This gives you the `uip` command.
+CLI をグローバルにインストールします。これで `uip` コマンドが使えるようになります。
 
 ```bash
 npm install -g @uipath/cli
 ```
 
-### 2. Sign in
+### 2. サインインする
 
-Authenticate once. Your coding agent reuses this same session, so it acts as you on the platform.
+一度だけ認証します。コーディングエージェントはこのセッションを再利用するため、プラットフォーム上ではあなた自身として動作します。
 
 ```bash
 uip login
 ```
 
-### 3. Install the UiPath skills
+### 3. UiPath スキルをインストールする
 
-`uip skills install` will launch an interactive installer for skills where you can pick your agent.
+`uip skills install` を実行すると、エージェントを選択できる対話式のインストーラーが起動します。
 
-Add the skills for a specific agent, e.g. **Claude Code**:
+特定のエージェント（例: **Claude Code**）向けにスキルを追加するには次のようにします。
 
 ```bash
 uip skills install --agent claude
 ```
 
-The installer walks you through selecting which skill bundles you need. For RPA pick **uipath-rpa** and **uipath-platform**. Add **uipath-coded-workflows** if you will also author coded workflows, and **uipath-agents**, **uipath-maestro-flow** if your project includes those.
+インストーラーが、必要なスキルバンドルの選択を順に案内してくれます。RPA であれば **uipath-rpa** と **uipath-platform** を選択してください。コーデッドワークフローも作成する場合は **uipath-coded-workflows** を、プロジェクトに該当する場合は **uipath-agents** や **uipath-maestro-flow** を追加します。
 
-Skills are published to GitHub, so you can pull them into custom toolchains and fork them for your own internal best practices.
+スキルは GitHub 上で公開されているため、独自のツールチェーンに取り込んだり、フォークして社内のベストプラクティスを反映したりできます。
 
-!!! info "Good to know"
-    The skills registry is public, so this step needs no login. You also don't need to install platform tools first — your agent auto-installs them on first use. **Claude Code** is global-only for skills; the `--local` flag is for other agents like Cursor.
+!!! info "知っておくと便利"
+    スキルレジストリは公開されているため、この手順にログインは不要です。また、プラットフォームツールを先にインストールしておく必要もありません。エージェントが初回利用時に自動でインストールします。**Claude Code** のスキルはグローバルインストールのみ対応です。`--local` フラグは Cursor など他のエージェント向けです。
 
-A few commands to keep handy:
+手元に置いておくと便利なコマンドをいくつか紹介します。
 
-Check your connection:
+接続状態を確認する。
 
 ```bash
 uip login status
 ```
 
-Connect to a different environment:
+別の環境に接続する。
 
 ```bash
 uip login --authority https://staging.uipath.com -t <TenantName>
 ```
 
-Check the version and keep tools current:
+バージョンを確認し、ツールを最新に保つ。
 
 ```bash
 uip --version
@@ -76,11 +76,11 @@ uip tools update
 uip skills update
 ```
 
-`uip --help` and `uip <command> --help` are your best friends, right after your coding agent.
+`uip --help` と `uip <command> --help` は、コーディングエージェントに次いで頼りになる存在です。
 
-### 4. Verify the setup
+### 4. セットアップを確認する
 
-To validate the currently installed tools, you can use the following commands:
+現在インストールされているツールを確認するには、次のコマンドを使います。
 
 ```bash
 uip --version
@@ -88,27 +88,27 @@ uip tools list --output table
 uip skills list
 ```
 
-Run your agent with new skills and then ask it for an outcome — not a command:
+新しいスキルを読み込んだ状態でエージェントを起動し、コマンドではなく「やりたいこと」を伝えてみましょう。
 
 ```text
-which uipath skills I can use? can you list tenants within environments I'm connected to?
+使える UiPath のスキルを教えてください。また、いま接続している環境の中にあるテナントを一覧表示できますか？
 ```
 
 [[[
-A correctly set-up agent will use the tools and give you the answer. If it doesn't recognize UiPath tasks, restart Claude Code once more so it reloads plugins.
+正しくセットアップされていれば、エージェントはツールを使って答えを返してくれます。UiPath のタスクを認識しない場合は、Claude Code をもう一度再起動してプラグインを読み込み直してください。
 |30|
-![Claude Code proposing the uip command sequence after a plain-language request](1-install-the-cli-and-skills.images/verify-agent-proposes-commands.png){ .screenshot }
+![プレーンな日本語の依頼を受けて uip コマンドの実行手順を提案する Claude Code](1-install-the-cli-and-skills.images/verify-agent-proposes-commands.png){ .screenshot }
 ]]]
 
-!!! info "Sessions, identity, and security"
-    The agent inherits your session and acts with your permissions. For a shared or service identity, sign in with an External Application session instead of a personal login.
+!!! info "セッション・アイデンティティ・セキュリティ"
+    エージェントはあなたのセッションを引き継ぎ、あなたの権限で動作します。共有アカウントやサービスアカウントとして動かしたい場合は、個人ログインではなく External Application セッションでサインインしてください。
 
-    Some agents run commands in isolated environments. In that case, they may not be able to run `uip` with your privileges. If `uip login status` shows you're connected in your terminal but your agent says otherwise, tell it:
+    エージェントによっては、コマンドを隔離された環境で実行するものがあります。その場合、`uip` をあなたの権限で実行できないことがあります。ターミナルでは `uip login status` が接続済みと表示されるのに、エージェント側は未接続だと言う場合は、次のように伝えてください。
 
     ```text
-    When using the UiPath CLI, prefer escalated execution because sandboxed commands may not reflect my real terminal session
+    UiPath CLI を使うときは、権限を昇格させた実行を優先してください。サンドボックス内で実行されたコマンドは、私の実際のターミナルセッションを反映していない可能性があります。
     ```
 
-    Avoid approving a blanket **uip** rule — that also covers destructive commands. Better to approve read/list prefixes as they come up.
+    **uip** 全体を一括で許可するルールを承認するのは避けてください。破壊的なコマンドまで含まれてしまいます。読み取り・一覧表示系のプレフィックスを、必要になった都度承認していくほうが安全です。
 
-Done. Your environment is ready.
+これで完了です。環境の準備が整いました。

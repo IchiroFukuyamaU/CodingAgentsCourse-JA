@@ -1,21 +1,21 @@
-# Agenda
-**This exercise runs as a single session of about 6–8 hours, including breaks.**
+# アジェンダ
+**この演習は、休憩を含めて約 6〜8 時間の 1 セッションとして実施します。**
 
-You'll get your environment ready, then build and deploy all four components of the pipeline — the AI agent, the loan officer app, the Maestro flow that ties them together, and the RPA workflow that drives the whole thing — finishing with a full end-to-end run.
+まず環境を整え、続いてパイプラインを構成する 4 つのコンポーネント（AI エージェント、ローン担当者用アプリ、それらをつなぐ Maestro フロー、そして全体を駆動する RPA ワークフロー）をすべて構築・デプロイします。最後にエンドツーエンドで通して実行します。
 
-| Step | Focus | Duration |
+| ステップ | 内容 | 所要時間 |
 | ---: | :--- | ---: |
-| [**What's a Coding Agent?**](what-is-a-coding-agent.md) | Understand the mental model, tools, skills, and how UiPath fits in | 15 min |
-| [**Installation Guides**](installation-guides.md) | Install Node.js, Python, .NET SDK, UiPath Studio, Git, and a coding agent | 15 min |
-| [**Install UiPath Skills**](install-skills.md) | Install the UiPath CLI, authenticate, and load the skills into your coding agent | 20 min |
-| [**1. AI Underwriting Assessment**](1-underwriting-agent.md) | Build and deploy the Python coded agent that scores a loan application | 70 min |
-| *Break* | | 15 min |
-| [**2. Loan Officer Review Dashboard**](2-loan-officer-app.md) | Build and deploy the React app a loan officer uses to approve or reject a case | 55 min |
-| *Lunch* | | 45 min |
-| [**3. Orchestrating with Maestro Flow**](3-maestro-flow.md) | Build the Maestro process that calls the agent and routes by risk band | 75 min |
-| *Break* | | 15 min |
-| [**4. Application Intake & Enrichment**](4-intake-enrichment.md) | Build the Studio RPA workflow that submits applications and kicks off the flow | 65 min |
-| [**You did it!**](you-did-it.md) | Trigger a full end-to-end run and see what's next | 30 min |
+| [**コーディングエージェントとは？**](what-is-a-coding-agent.md) | 全体像、ツール、スキル、そして UiPath がどこに位置づくのかを理解する | 15 分 |
+| [**インストールガイド**](installation-guides.md) | Node.js、Python、.NET SDK、UiPath Studio、Git、コーディングエージェントをインストールする | 15 分 |
+| [**UiPath スキルのインストール**](install-skills.md) | UiPath CLI をインストールして認証し、スキルをコーディングエージェントに読み込む | 20 分 |
+| [**1. AI による与信審査**](1-underwriting-agent.md) | ローン申込をスコアリングする Python のコーデッドエージェントを構築・デプロイする | 70 分 |
+| *休憩* | | 15 分 |
+| [**2. ローン担当者レビュー用ダッシュボード**](2-loan-officer-app.md) | ローン担当者が承認・却下を判断するための React アプリを構築・デプロイする | 55 分 |
+| *昼食* | | 45 分 |
+| [**3. Maestro Flow によるオーケストレーション**](3-maestro-flow.md) | エージェントを呼び出し、リスクバンドに応じて振り分ける Maestro プロセスを構築する | 75 分 |
+| *休憩* | | 15 分 |
+| [**4. 申込受付とデータ補完**](4-intake-enrichment.md) | 申込を送信してフローを起動する Studio の RPA ワークフローを構築する | 65 分 |
+| [**完了です！**](you-did-it.md) | エンドツーエンドで通して実行し、次の一歩を確認する | 30 分 |
 
-!!! tip "Training Environment"
-    Log in at **[{{ training_url }}]({{ training_url }})** and use tenant **{{ training_tenant }}** for this exercise. Everything you deploy goes into the shared **CodingAgentsILT** folder in **Orchestrator**.
+!!! tip "トレーニング環境"
+    この演習では **[{{ training_url }}]({{ training_url }})** にログインし、テナント **{{ training_tenant }}** を使用してください。デプロイするものはすべて、**Orchestrator** の共有フォルダー **CodingAgentsILT** に配置します。

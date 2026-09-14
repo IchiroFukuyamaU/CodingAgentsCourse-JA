@@ -1,102 +1,104 @@
-# AI Underwriting Assessment
-Use the `uipath-agents` skill to generate a Python LangGraph agent that retrieves loan data from the UiBank API, computes financial metrics, and uses the LLM to interpret the results and produce a credit assessment.
+# AI による与信審査
+`uipath-agents` スキルを使って、UiBank API からローンのデータを取得し、財務指標を計算し、LLM にその結果を解釈させて与信審査の結果を生成する Python / LangGraph エージェントを生成します。
 
-## 1. Open Your Project Folder in Your Coding Agent
+## 1. プロジェクトフォルダーをコーディングエージェントで開く
 
-Create an empty folder called `LoanUnderwritingAgent` and open it in your coding agent (e.g. Claude Code, Codex):
+`LoanUnderwritingAgent` という名前の空のフォルダーを作成し、コーディングエージェント（Claude Code、Codex など）で開きます。
 
 ```bash
 mkdir LoanUnderwritingAgent
 ```
 
-## 2. Describe the Agent
+## 2. エージェントの内容を説明する
 
-Give your coding agent a plain-English description of what to build:
-
-```text
-Build a UiPath Coded Agent in LangGraph that:
-
-1. Takes a loan_id as input
-2. Verifies the loan quote by calling the UiBank API (https://uibank-api.uipath.com/explorer/swagger.json, no authentication required) and extracts the applicant's loan amount, loan term, yearly income, and age
-3. Retrieves the average loan amount across all UiBank applications for market benchmarking
-4. Computes raw financial metrics and surfaces them to the LLM: monthly repayment amount, debt-to-income ratio (the monthly repayment as a share of monthly income), and how the loan compares to the market average
-5. Uses the LLM to interpret the metrics, assign a credit score (0–100) and risk band (Low / Medium / High), and generate a plain-English assessment summary
-
-Include an eval set with 5 cases. The name of the agent should be {YourName}LoanUnderwritingAgent. Use the UiPath SDK.
-```
-
-Your coding agent reads the `uipath-agents` skill context and generates a complete agent project:
-
-- `main.py` — the agent entry point with the LangGraph graph definition (tools may be here or in a separate `tools.py`)
-- `pyproject.toml` — project configuration with `uipath-langgraph` dependency
-- `evals/` — a folder with 5 evaluation cases
-
-## 3. Review the Generated Code
-
-Open the project in your IDE. Every coding agent generates slightly different code — the structure varies. What matters is that the essentials are there.
-
-**What to look for:**
-
-- **Three `@tool`-decorated functions** — one each for `verify_quote`, `get_average_loan_amount`, and `compute_financial_metrics`. These may live in a separate `tools.py` or all inside `main.py` — either is fine.
-- **A system prompt** — a `SYSTEM_PROMPT` string instructing the LLM to interpret the financial metrics holistically and produce a credit score, risk band, and assessment summary. It's usually inline in `main.py` rather than a separate file — built as a plain prompt string.
-- **An agent entry point** — defined in `langgraph.json`, which points to `main.py:graph` (where `graph = builder.compile()`); this is also registered as the `"agent"` entry point in `entry-points.json`.
-- **`evals/`** — 5 test cases covering a range of risk profiles, used to validate the agent's scoring behaviour with `uipath eval`.
-
-Check the system prompt. It should instruct the LLM to reason about the combination of metrics and produce a natural language explanation — not map thresholds to a fixed score. If the prompt is too mechanical, ask your coding agent:
+作りたいものを、コーディングエージェントに平易な言葉で説明します。
 
 ```text
-Update the system prompt so the LLM reasons about the combination of
-factors rather than applying fixed rules — a high DTI with a small loan
-amount should be treated differently from the same DTI with a large loan
+次の処理を行う UiPath のコーデッドエージェントを LangGraph で構築してください:
+
+1. loan_id を入力として受け取る
+2. UiBank API（https://uibank-api.uipath.com/explorer/swagger.json、認証不要）を呼び出してローン見積を検証し、
+   申込者の借入希望額（loan amount）、借入期間（loan term）、年収（yearly income）、年齢（age）を抽出する
+3. 市場水準との比較のため、UiBank の全申込における平均借入額を取得する
+4. 加工前の財務指標を計算して LLM に提示する: 月々の返済額、債務所得比率（月々の返済額が月収に占める割合）、
+   および当該ローンが市場平均と比べてどの水準にあるか
+5. LLM にそれらの指標を解釈させ、クレジットスコア（0〜100）とリスクバンド（Low / Medium / High）を付与し、
+   平易な言葉での審査サマリーを生成する
+
+5 件のケースからなる eval セットも含めてください。エージェントの名前は {YourName}LoanUnderwritingAgent とします。UiPath SDK を使用してください。
 ```
 
-## 4. Test the Agent Locally
+コーディングエージェントは `uipath-agents` スキルのコンテキストを読み取り、完全なエージェントプロジェクトを生成します。
 
-### 1. Navigate to your project folder
+- `main.py` — LangGraph のグラフ定義を含むエージェントのエントリーポイント（ツールはここに書かれる場合も、別の `tools.py` に分かれる場合もあります）
+- `pyproject.toml` — `uipath-langgraph` を依存関係に含むプロジェクト設定
+- `evals/` — 5 件の評価ケースが入ったフォルダー
 
-Open a terminal and navigate to the `LoanUnderwritingAgent` folder you created:
+## 3. 生成されたコードをレビューする
+
+プロジェクトを IDE で開きます。コーディングエージェントごとに生成されるコードは少しずつ異なり、構成にも幅があります。重要なのは、必要な要素が揃っているかどうかです。
+
+**確認すべきポイント:**
+
+- **`@tool` デコレーターの付いた 3 つの関数** — `verify_quote`、`get_average_loan_amount`、`compute_financial_metrics` に対応するものです。別ファイルの `tools.py` にあっても、すべて `main.py` の中にあっても構いません。
+- **システムプロンプト** — 財務指標を総合的に解釈し、クレジットスコア・リスクバンド・審査サマリーを生成するよう LLM に指示する `SYSTEM_PROMPT` 文字列です。通常は別ファイルではなく `main.py` にインラインで、プレーンなプロンプト文字列として組み立てられます。
+- **エージェントのエントリーポイント** — `langgraph.json` で定義され、`main.py:graph`（`graph = builder.compile()` の部分）を指します。これは `entry-points.json` にも `"agent"` エントリーポイントとして登録されます。
+- **`evals/`** — さまざまなリスクプロファイルを網羅した 5 件のテストケース。`uipath eval` でエージェントのスコアリング挙動を検証するために使います。
+
+システムプロンプトを確認してください。しきい値を固定のスコアに機械的に対応づけるのではなく、指標の組み合わせについて推論し、自然言語で説明を生成するよう LLM に指示しているはずです。プロンプトが機械的すぎる場合は、コーディングエージェントに次のように依頼します。
+
+```text
+システムプロンプトを修正して、固定のルールを当てはめるのではなく、複数の要因の組み合わせについて
+LLM が推論するようにしてください。たとえば、DTI が高くても借入額が小さい場合と、同じ DTI で
+借入額が大きい場合とでは、扱いが変わるべきです。
+```
+
+## 4. エージェントをローカルでテストする
+
+### 1. プロジェクトフォルダーに移動する
+
+ターミナルを開き、作成した `LoanUnderwritingAgent` フォルダーに移動します。
 
 ```bash
 cd "/path/to/your/LoanUnderwritingAgent"
 ```
 
-Replace the path with the actual location on your machine.
+パスは、お使いのマシン上の実際の場所に置き換えてください。
 
-### 2. Run and Verify Your Agent
+### 2. エージェントを実行して確認する
 
-Give this prompt to your coding agent — it finds real loan IDs across a spread of risk profiles, runs the agent against each, and checks the output:
+次のプロンプトをコーディングエージェントに渡してください。さまざまなリスクプロファイルにまたがる実在のローン ID を探し、それぞれでエージェントを実行し、出力を確認してくれます。
 
 ```text
-Test the LoanUnderwritingAgent I just built.
+いま構築した LoanUnderwritingAgent をテストしてください。
 
-1. Open and inspect the UiBank Swagger documentation:
+1. UiBank の Swagger ドキュメントを開いて内容を確認してください:
    https://uibank-api.uipath.com/explorer/swagger.json
 
-2. Using only documented, read-only endpoints, find 3 existing loan quotes
-   that cover a spread of risk profiles — e.g. a small loan with a healthy
-   income ratio, a large loan with a long term, and an applicant with a
-   tight income-to-loan ratio.
+2. ドキュメントに記載された読み取り専用のエンドポイントのみを使い、リスクプロファイルに幅がある
+   既存のローン見積を 3 件見つけてください。たとえば、収入とのバランスが良好な少額のローン、
+   期間の長い高額のローン、収入に対する借入額の比率が厳しい申込者、といった具合です。
 
-   Requirements:
-   - Do not create, update, or delete any data.
-   - Do not invent or reuse an unverified loan_id — verify each record exists.
+   要件:
+   - データの作成・更新・削除は一切行わないこと。
+   - loan_id を捏造したり、存在を確認していない ID を使い回したりしないこと。各レコードが実在することを検証すること。
 
-3. For each loan_id, run the coded agent, saving each result to its own output file.
+3. 各 loan_id について、コーデッドエージェントを実行し、結果をそれぞれ別の出力ファイルに保存してください。
 
-4. Read each out-*.json and confirm it contains:
-   - a credit_score between 0 and 100
-   - a risk_band of Low, Medium, or High
-   - a plain-English assessment summary that actually reasons about the
-     metrics (debt-to-income ratio, market comparison) rather than generic text
+4. 各 out-*.json を読み、次の内容が含まれていることを確認してください:
+   - 0 から 100 の間の credit_score
+   - Low、Medium、High のいずれかの risk_band
+   - 一般論ではなく、実際に指標（債務所得比率、市場平均との比較）に基づいて推論した、
+     平易な言葉での審査サマリー
 
-5. Report a table: loan_id | loan amount | term | income | age | credit score | risk band.
-   Flag anything suspicious — identical scores across very different profiles,
-   missing fields, or an exception.
+5. 次の表形式で報告してください: loan_id | 借入額 | 期間 | 収入 | 年齢 | クレジットスコア | リスクバンド。
+   不審な点（プロファイルが大きく異なるのにスコアが同一、フィールドの欠落、例外の発生など）があれば
+   指摘してください。
 ```
 
-## 5. Deploy the Agent
+## 5. エージェントをデプロイする
 
-Activate the virtual environment first:
+まず仮想環境を有効化します。
 
 === "Mac / Linux"
     ```bash
@@ -104,19 +106,19 @@ Activate the virtual environment first:
     ```
 
 === "Windows"
-    **Command Prompt:**
+    **コマンドプロンプト:**
     ```bash
     .venv\Scripts\activate
     ```
-    **PowerShell** (allow scripts first if needed):
+    **PowerShell**（必要に応じて、先にスクリプトの実行を許可します）:
     ```bash
     Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
     .\.venv\Scripts\Activate.ps1
     ```
 
-### Publish the Agent
+### エージェントを公開する
 
-Run setup and initialisation:
+セットアップと初期化を実行します。
 
 ```bash
 uip codedagent setup --force
@@ -135,7 +137,7 @@ uip codedagent setup --force
 }
 ```
 
-Set your tenant and verify you're logged in:
+テナントを設定し、ログイン状態を確認します。
 
 ```bash
 uip login tenant set CodingAgentsPractice --output json
@@ -169,7 +171,7 @@ uip login status --output json
 }
 ```
 
-Initialise the UiPath project. This generates the entry points, Mermaid diagram, and project manifest:
+UiPath プロジェクトを初期化します。これによりエントリーポイント、Mermaid 図、プロジェクトマニフェストが生成されます。
 
 ```bash
 uip codedagent init
@@ -215,7 +217,7 @@ uip codedagent init
        └─────────┘
 ```
 
-### Deploy the Agent
+### エージェントをデプロイする
 
 ```bash
 uip codedagent deploy --tenant
@@ -232,9 +234,9 @@ Authors    : {YourName}
 ✓  Package published successfully!
 ```
 
-### Create the Process
+### プロセスを作成する
 
-First, find the package and its entry point:
+まず、パッケージとそのエントリーポイントを確認します。
 
 ```bash
 uip or packages list --search "{YourName}LoanUnderwritingAgent" --output json
@@ -244,7 +246,7 @@ uip or packages list --search "{YourName}LoanUnderwritingAgent" --output json
 uip or packages entry-points "{YourName}LoanUnderwritingAgent:0.0.1" --output json
 ```
 
-Then create the process:
+続いてプロセスを作成します。
 
 === "Mac / Linux"
     ```bash
@@ -268,27 +270,26 @@ Then create the process:
       --output json
     ```
 
-### Find a Test Loan ID
+### テスト用のローン ID を探す
 
-Ask your coding agent to find a valid loan ID from UiBank:
+UiBank から有効なローン ID を見つけるよう、コーディングエージェントに依頼します。
 
 ```text
-Open and inspect the UiBank Swagger documentation:
+UiBank の Swagger ドキュメントを開いて内容を確認してください:
 
 https://uibank-api.uipath.com/explorer/swagger.json
 
-Using only endpoints documented by the API, identify the read-only endpoint
-for retrieving loan quotes. Make a GET request and return one loan_id that
-currently exists in UiBank.
+API に記載されているエンドポイントのみを使い、ローン見積を取得するための読み取り専用エンドポイントを
+特定してください。GET リクエストを実行し、現在 UiBank に存在する loan_id を 1 件返してください。
 
-Requirements:
-- Do not create, update, or delete any data.
-- Do not invent or reuse an unverified ID.
-- Verify that the returned record exists.
-- Return the loan_id and a PowerShell command for running the agent.
-- Escape the JSON correctly for PowerShell.
+要件:
+- データの作成・更新・削除は一切行わないこと。
+- ID を捏造したり、存在を確認していない ID を使い回したりしないこと。
+- 返すレコードが実在することを検証すること。
+- loan_id と、エージェントを実行するための PowerShell コマンドを返すこと。
+- JSON は PowerShell 向けに正しくエスケープすること。
 ```
 
-### Run the Deployed Agent from Orchestrator
+### デプロイ済みエージェントを Orchestrator から実行する
 
-In **Orchestrator**, navigate to your **CodingAgentsILT** folder, open `{YourName}LoanUnderwritingAgent`, and start a run with the `loan_id` returned by your coding agent as an input argument. Check the job output for the credit score, risk band, and assessment summary.
+**Orchestrator** で **CodingAgentsILT** フォルダーを開き、`{YourName}LoanUnderwritingAgent` を選択して、コーディングエージェントが返した `loan_id` を入力引数に指定して実行を開始します。ジョブの出力で、クレジットスコア、リスクバンド、審査サマリーを確認してください。

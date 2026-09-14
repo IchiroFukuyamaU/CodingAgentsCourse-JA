@@ -1,33 +1,33 @@
-# Build Your First Agent
+# 初めてのエージェントを作る
 
-!!! tip "Here is our plan for this lesson:"
+!!! tip "このレッスンの進め方"
 
-    1. Set up a working folder with the sample files.
-    2. Ask **Claude Code** to generate a simple agent with the UiPath agent skill.
-    3. Watch it scaffold the solution, configure the schema, and validate.
-    4. Publish it to **Studio Web**, run it, and review the result.
+    1. サンプルファイルを入れた作業フォルダーを用意します。
+    2. UiPath のエージェントスキルを使って、**Claude Code** にシンプルなエージェントを生成してもらいます。
+    3. ソリューションのスキャフォールド、スキーマの設定、検証までの流れを観察します。
+    4. **Studio Web** に公開して実行し、結果を確認します。
 
-## Goal
+## ゴール
 
-This lesson isn't about building something clever — it's about learning the **build-and-publish workflow** you'll use for every agent after this. You'll generate a small, low-code agent with Claude Code, see how it scaffolds a solution, and get it ready to run. The agent itself is deliberately simple so the focus stays on the loop: describe → generate → validate → publish → run.
+このレッスンの目的は、気の利いた何かを作ることではありません。これ以降すべてのエージェントで使うことになる **「構築して公開する」ワークフロー** を身につけることです。Claude Code で小さなローコードエージェントを生成し、ソリューションがどのようにスキャフォールドされるのかを見て、実行できる状態まで持っていきます。エージェント自体はあえてシンプルにしてあります。焦点を当てたいのは「説明する → 生成する → 検証する → 公開する → 実行する」というループそのものだからです。
 
-## What you'll build
+## 何を作るのか
 
-A **Claims Eligibility** check. Given a claim (FNOL) PDF and the policy it refers to, the agent runs five quick threshold checks, in order, and stops at the first hard failure:
+**保険金請求の受理可否（Claims Eligibility）チェック** です。請求（FNOL）の PDF と、そこで参照されている保険証券が与えられると、エージェントは 5 つの簡易なしきい値チェックを順番に実行し、最初のハードな不合格が出た時点で停止します。
 
-1. **Policy status** — is the policy Current/Paid (not Lapsed/Cancelled/Expired)?
-2. **Identity** — does the claimant match the named insured?
-3. **Address** — do the claim and policy addresses match?
-4. **Coverage period** — did the incident happen within the policy dates?
-5. **Filing deadline** — was the claim filed within 60 days of the loss?
+1. **保険証券のステータス** — 証券は Current / Paid か（Lapsed / Cancelled / Expired ではないか）？
+2. **本人確認** — 請求者は証券の記名被保険者と一致するか？
+3. **住所** — 請求書と証券の住所は一致するか？
+4. **補償期間** — 事故は証券の有効期間内に発生したか？
+5. **請求期限** — 損害発生から 60 日以内に請求されているか？
 
-It reads the raw PDFs directly — no extra setup. (Later exercises build richer agents with context, tools, and structured extraction.) The validation logic and output structure are below; you'll paste both into Claude Code.
+このエージェントは PDF をそのまま直接読み取ります。追加のセットアップは不要です。（以降の演習では、コンテキストやツール、構造化された抽出処理を備えた、より本格的なエージェントを構築します。）判定ロジックと出力の構造は下記のとおりで、いずれも Claude Code に貼り付けて使います。
 
-## Steps
+## 手順
 
-### 1. Set up your working folder
+### 1. 作業フォルダーを用意する
 
-Create an empty folder and add the sample claim and policy PDFs (download them from the sample claims below).
+空のフォルダーを作成し、そこにサンプルの請求書 PDF と保険証券 PDF を追加します（PDF は後述のサンプルからダウンロードしてください）。
 
 ```bash
 mkdir first-agent
@@ -36,73 +36,73 @@ mkdir samples
 ```
 
 <details markdown="1">
-<summary>Optional step: define your conventions AGENTS.md)</summary>
+<summary>任意の手順: 自分の規約を定義する（AGENTS.md）</summary>
 
-Before you build much, drop a small file in the folder with your conventions: naming, structure, and rules like "*keep workflows small; don't put everything in one folder*". 
+本格的に作り始める前に、命名規則・構造・「*ワークフローは小さく保つ。すべてを 1 つのフォルダーに詰め込まない*」といったルールを書いた小さなファイルをフォルダーに置いておきましょう。
 
-- Your coding agent reads it automatically and follows it on every new session. 
-- It's not just about the prompt, this markdown file helps to steer the agent, this will keeps output consistent across coding sessions and across agents. 
-- There's no single file name at the moment (**`CLAUDE.md`**/**`AGENTS.md`**/**`GEMINI.md`**/etc). If you plan to use various agents, best practice is to keep one real file and symlink the rest to it if your coding agent has different name.
-- Here is initial sample - expand it as and when needed:
+- コーディングエージェントはこのファイルを自動的に読み、新しいセッションのたびに従ってくれます。
+- プロンプトだけがすべてではありません。この Markdown ファイルはエージェントの方向づけに役立ち、セッションをまたいでも、エージェントを変えても、出力の一貫性を保てます。
+- 現時点でファイル名は統一されていません（**`CLAUDE.md`** / **`AGENTS.md`** / **`GEMINI.md`** など）。複数のエージェントを使う予定なら、実体のファイルを 1 つだけ置き、名前が異なるエージェント向けにはシンボリックリンクを張るのがベストプラクティスです。
+- 以下は出発点となるサンプルです。必要に応じて拡張してください。
 
 ```markdown
-# Creating new projects
+# 新しいプロジェクトを作るとき
 
-- When I ask to build something this workspace folder, create a new project folder (short, lowercase, hyphenated) instead of working in the workspace root.
-- Initialize with `git init` unless already inside an existing repo.
-- Add a project-level `AGENTS.md` (like this one) before substantial implementation, so future sessions keep the same behavior.
-- Continue all implementation, validation, and file edits inside the new project folder.
+- このワークスペースフォルダーで何かを作るよう依頼されたら、ワークスペース直下で作業せず、新しいプロジェクトフォルダー（短く、小文字、ハイフン区切り）を作成すること。
+- 既存のリポジトリの内側でない限り、`git init` で初期化すること。
+- 本格的な実装に入る前に、プロジェクト単位の `AGENTS.md`（このファイルのようなもの）を追加し、以降のセッションでも同じ振る舞いが保たれるようにすること。
+- 実装・検証・ファイル編集はすべて、その新しいプロジェクトフォルダーの中で続けること。
 
-# UiPath projects
+# UiPath プロジェクト
 
-- If a request mentions UiPath, RPA, Orchestrator, Maestro, Studio Web, `.xaml`, `.flow`, `.bpmn`, context grounding, queues, assets, robots, jobs, triggers, or `uip`, the installed UiPath agent skills when relevant.
-- Prefer the uip CLI for setup, validation, build, packaging, run, and platform operations. 
-- Ask before publishing, deploying, deleting, or modifying any UiPath Cloud/Orchestrator resource (package, folder, queue item, etc).
+- 依頼に UiPath、RPA、Orchestrator、Maestro、Studio Web、`.xaml`、`.flow`、`.bpmn`、コンテキストグラウンディング、キュー、アセット、ロボット、ジョブ、トリガー、`uip` が含まれる場合は、インストール済みの UiPath エージェントスキルを適宜使用すること。
+- セットアップ、検証、ビルド、パッケージング、実行、プラットフォーム操作には uip CLI を優先して使うこと。
+- UiPath Cloud / Orchestrator のリソース（パッケージ、フォルダー、キューアイテムなど）を公開・デプロイ・削除・変更する前には、必ず確認を取ること。
 ```
 </details>
 
-### 2. Open your coding agent to start
+### 2. コーディングエージェントを開いて始める
 
-Download the paired claim and policy files below into folder "samples" of the folder you have created. Each claim references its policy by number, and must be run with its **matching** policy. Have a quick look at input documents.
+下記の請求書ファイルと保険証券ファイルのペアを、先ほど作成したフォルダー内の "samples" フォルダーにダウンロードしてください。各請求書は証券番号で対応する証券を参照しており、必ず **対応する** 証券と組み合わせて実行する必要があります。入力ドキュメントにも軽く目を通しておきましょう。
 
-| Claim | Policy | Scenario |
+| 請求書（Claim） | 保険証券（Policy） | シナリオ |
 | :--- | :--- | :--- |
-| [CLM-2026-357861-claim.pdf](assets/claim-samples/CLM-2026-357861-claim.pdf) | [HO-5534416561.pdf](assets/claim-samples/HO-5534416561.pdf) | Mumbai (INR) — water damage, Rajesh Kumar Sharma |
-| [CLM-2026-896147-claim.pdf](assets/claim-samples/CLM-2026-896147-claim.pdf) | [HO-3883873532.pdf](assets/claim-samples/HO-3883873532.pdf) | Melbourne (AUD) — fire damage, Mei Lin Tan |
+| [CLM-2026-357861-claim.pdf](assets/claim-samples/CLM-2026-357861-claim.pdf) | [HO-5534416561.pdf](assets/claim-samples/HO-5534416561.pdf) | ムンバイ（INR）— 水濡れ損害、Rajesh Kumar Sharma |
+| [CLM-2026-896147-claim.pdf](assets/claim-samples/CLM-2026-896147-claim.pdf) | [HO-3883873532.pdf](assets/claim-samples/HO-3883873532.pdf) | メルボルン（AUD）— 火災損害、Mei Lin Tan |
 
-Open your coding agent in that folder. Give it the instruction below:
+そのフォルダーでコーディングエージェントを開き、以下の指示を与えてください。
 
 ```text hl_lines="3-5 24-64"
-Using the UiPath agent skill, generate a low-code agent named "claims-eligibility-agent". The agent takes two file input PDF files: claim and policy. It reads both PDFs and validates the claim against the policy.
+UiPath のエージェントスキルを使って、"claims-eligibility-agent" という名前のローコードエージェントを生成してください。このエージェントは、請求書（claim）と保険証券（policy）の 2 つの PDF ファイルを入力として受け取ります。両方の PDF を読み取り、保険証券に照らして請求内容を検証します。
 
-Inputs:
-- in_ClaimPDF — the First Notice of Loss (FNOL) claim form submitted by the claimant (PDF).
-- in_PolicyPDF — the homeowner's insurance policy referenced by the claim (PDF).
+入力:
+- in_ClaimPDF — 請求者が提出した事故受付通知（FNOL: First Notice of Loss）の請求フォーム（PDF）。
+- in_PolicyPDF — その請求が参照している住宅総合保険の保険証券（PDF）。
 
-Things that agent needs to check between 2 input documents:
-1. Policy Status Check. Find the Payment Status on the policy. Acceptable statuses are "Current" 
-   and "Paid". If it is "Lapsed", "Cancelled", or "Expired", the check fails.
-2. Identity Verification. Compare the Claimant Name on the claim to the Named Insured on the
-   policy. Allow minor variations (nicknames, middle names, minor spelling). If they refer to
-   different people, the check fails.
-3. Property Address Match. Compare the property address on the claim and the policy. Normalize
-   formatting (e.g. "St." vs "Street"). If they differ, the check fails. This exercise has no
-   separate incident report, so set report_address to "N/A — no incident report in this exercise".
-4. Coverage Period Check. Confirm the Incident Date falls on or after the policy Effective Date
-   and on or before the Expiration Date. If outside this window, the check fails.
-5. Filing Deadline Check. Calculate calendar days between the Incident Date and the Date of
-   Submission. If greater than 60 days, check whether the claim provides any explanation for the
-   delay. No explanation → fail. 
+エージェントが 2 つの入力ドキュメント間で確認すべき項目:
+1. 保険証券ステータスの確認（Policy Status Check）。保険証券上の Payment Status を探します。許容されるステータスは
+   "Current" と "Paid" です。"Lapsed"、"Cancelled"、"Expired" の場合はこのチェックは不合格とします。
+2. 本人確認（Identity Verification）。請求書上の Claimant Name と、保険証券上の Named Insured を比較します。
+   軽微な差異（愛称、ミドルネーム、軽微なスペルの揺れ）は許容します。明らかに別人を指している場合は
+   このチェックは不合格とします。
+3. 物件住所の一致確認（Property Address Match）。請求書と保険証券に記載された物件住所を比較します。
+   表記の揺れ（例: "St." と "Street"）は正規化して比較します。異なる場合はこのチェックは不合格とします。
+   本演習には独立した事故報告書が存在しないため、report_address には
+   "N/A — no incident report in this exercise" を設定してください。
+4. 補償期間の確認（Coverage Period Check）。Incident Date が保険証券の Effective Date 以降、かつ
+   Expiration Date 以前であることを確認します。この期間外であればこのチェックは不合格とします。
+5. 請求期限の確認（Filing Deadline Check）。Incident Date と Date of Submission の間の暦日数を計算します。
+   60 日を超えている場合は、請求書に遅延理由の説明があるかどうかを確認します。説明がなければ不合格とします。
 
-The agent must return output matching this structure, this will be used by downstream apps and agents:
+エージェントは必ず以下の構造に一致する出力を返す必要があります。この出力は後続のアプリやエージェントで利用されます:
 
 {
-  "out_isEligible": "boolean — whether the claim is eligible for assessment",
-  "out_EligibilityAnalysisSummary": "string — brief plain-language explanation of the decision",
+  "out_isEligible": "boolean — 請求が審査の対象として受理できるかどうか",
+  "out_EligibilityAnalysisSummary": "string — 判定理由の簡潔でわかりやすい説明",
   "out_EligibilityChecksJSON": {
     "claim_id": "string",
     "policy_number": "string",
-    "escalate": "boolean - if this claim requires further human review",
+    "escalate": "boolean — この請求に人によるさらなる確認が必要かどうか",
     "checks": {
       "policy_status": {
         "result": "pass | fail",
@@ -139,110 +139,112 @@ The agent must return output matching this structure, this will be used by downs
 }
 
 
-- All checks pass → out_isEligible = true, otherwise false
-- Issue is a late filing with justification → out_isEligible = true, "escalate" = true
-- Clearly mention that agent should not infer information that is not explicitly present in the documents.
-- This is FNOL/Claims eligibility process for property claims, write prompt that would take into account common aspects and industry best practices.
+- すべてのチェックが合格 → out_isEligible = true、それ以外は false
+- 問題が「遅延提出だが正当な理由がある」場合のみ → out_isEligible = true、"escalate" = true
+- ドキュメントに明示されていない情報をエージェントが推測してはならない旨を、プロンプト内で明確に記載してください。
+- これは物件損害に関する FNOL / 保険金請求の受理可否プロセスです。この業務で一般的に考慮される観点と業界のベストプラクティスを踏まえたプロンプトを書いてください。
 
-There are a couple of sample documents that the agent will process in the samples subfolder.
+エージェントが処理するサンプルドキュメントが samples サブフォルダーにいくつか置かれています。
 ```
 
-### 3. Watch it scaffold
+### 3. スキャフォールドの様子を見る
 
-Claude Code will work through roughly this sequence (approve each step as it goes):
+Claude Code は、おおむね次の順序で作業を進めます（各ステップを都度承認してください）。
 
-- create a **solution**, then initialize the agent inside it;
-- add the agent project to the solution;
-- write the **system prompt** and configure the **input/output schema** (two file inputs, three outputs);
-- run a **validate** step to confirm the configuration is supported by Studio Web.
+- **ソリューション** を作成し、その中にエージェントを初期化する
+- エージェントプロジェクトをソリューションに追加する
+- **システムプロンプト** を記述し、**入出力スキーマ** を設定する（ファイル入力 2 つ、出力 3 つ）
+- **validate** を実行して、その構成が Studio Web でサポートされていることを確認する
 
 <details markdown="1">
-<summary>Here is what output will look like</summary>
-- I’ll use the uipath-agents skill because this is a UiPath low-code agent authoring task. I’m going to **inspect the skill instructions** and the existing project shape before creating the agent files.
-- The request is explicitly low-code, so I’m treating this as an agent.json **Agent Builder project**. I’m checking whether there is already an agent or solution scaffold so I can preserve any existing structure.
-- There’s no existing project scaffold in the workspace, only sample PDFs. I’m reading the low-code agent guidance next so the generated files match UiPath’s expected schema and lifecycle.
-- The low-code workflow requires probing the local uip solution command before scaffolding, because the CLI renamed solution new to solution init in newer versions. I’m doing that probe now, then I’ll create the project from the supported command path.
-- Ran command: `$ uip solution init --output json`
-- The CLI supports `uip solution init`, so I’ll use the current lifecycle. I’m reading the low-code JSON, prompt, file-attachment, and validation references before writing the scaffolded agent.
-- The key constraint here is that attachment inputs only expose metadata in prompts. I’m going to add UiPath’s built-in Analyze Files tool and explicitly instruct the agent to call it for both PDFs before making any eligibility decision.
-- Because this is an input-to-output eligibility decision, I’m using the autonomous agent variant. I’m checking the autonomous-specific rules before I scaffold and patch the files.
-- The scaffold should not keep the default model blindly, so I’m checking the tenant model list.
-- I’m reading the sample claim/policy text now so the agent prompt can name the fields it should look for and handle the likely document wording.
-- The samples confirm the fields are explicit: claim number, submission date, claimant, policy number, property address, incident date, policy payment status, named insured, policy period, and described property. I’m scaffolding a solution plus a standalone autonomous low-code agent named claims-eligibility now.
-- The solution scaffold was created successfully. I’m adding the low-code agent project inside it so the project is registered with the solution manifest.
-- Ran command: `$ uip agent init claims-eligibility-solution/claims-eligibility --output json`
-- The agent scaffold registered cleanly. I’m reading the generated JSON files before patching them, so I only change the supported source files and let refresh regenerate derived files.
-- I’m going to make two source edits: replace the scaffold prompt/schemas with the claims eligibility contract, and add the Analyze Files built-in tool resource. After that I’ll run uip agent refresh and uip agent validate so derived files are regenerated by the CLI.
-- I’m applying the prompt, attachment schemas, typed output contract, and built-in tool definition now. The prompt explicitly forbids inference beyond the documents and limits the task to eligibility screening rather than final coverage adjudication.
-- The source files are patched. I’m doing a JSON parse check first, then I’ll run UiPath refresh/validation so entry-points.json and bindings_v2.json are generated rather than hand-edited.
-- JSON parsing passed. I’m running uip agent refresh next;
-- Schema parity is exact. I’m running the CLI migration again now
-- Migration completed and generated builder artifacts. I’m running the read-only validation pass now to verify the final project state.
-- Ran command: `$ uip agent validate claims-eligibility-solution/claims-eligibility --output json`
-- Validation passed. I’m doing a final file/status check so I can report exactly what was created and any caveats around testing with PDF attachments.
-- The project is valid locally, and the generated .agent-builder files are present. I’m checking the generated binding once so the Analyze Files resource is definitely included in the build output.
+<summary>実際の出力例</summary>
+- これは UiPath のローコードエージェントを作成するタスクなので、uipath-agents スキルを使います。エージェントのファイルを作る前に、**スキルの手順** と既存プロジェクトの構成を確認します。
+- 依頼には明示的に「ローコード」とあるため、agent.json ベースの **Agent Builder プロジェクト** として扱います。既存の構造を壊さないよう、すでにエージェントやソリューションのスキャフォールドがあるかを確認しています。
+- ワークスペースには既存のプロジェクトスキャフォールドはなく、サンプル PDF だけがあります。生成するファイルが UiPath の想定するスキーマとライフサイクルに沿うよう、次にローコードエージェントのガイダンスを読みます。
+- ローコードのワークフローでは、スキャフォールドの前にローカルの uip solution コマンドを確認する必要があります。新しいバージョンの CLI で solution new が solution init に改称されたためです。いまその確認を行い、サポートされているコマンドでプロジェクトを作成します。
+- 実行したコマンド: `$ uip solution init --output json`
+- この CLI は `uip solution init` に対応しているため、現行のライフサイクルを使います。スキャフォールドしたエージェントを書く前に、ローコードの JSON、プロンプト、ファイル添付、検証に関するリファレンスを読みます。
+- ここで重要な制約は、添付ファイル入力はプロンプト上ではメタデータしか参照できないという点です。UiPath 組み込みの Analyze Files ツールを追加し、受理可否を判断する前に両方の PDF に対して必ずこのツールを呼び出すよう、エージェントに明示的に指示します。
+- これは入力から出力を導く受理可否の判断なので、autonomous エージェントのバリアントを使います。スキャフォールドしてファイルを修正する前に、autonomous 固有のルールを確認します。
+- スキャフォールドのデフォルトモデルをそのまま使うべきではないので、テナントのモデル一覧を確認します。
+- エージェントのプロンプトが探すべきフィールド名を正しく指定し、想定される文書の言い回しに対応できるよう、いまサンプルの請求書・保険証券のテキストを読んでいます。
+- サンプルを見ると、必要なフィールドはすべて明示されています: 請求番号、提出日、請求者、証券番号、物件住所、事故日、保険料の支払いステータス、記名被保険者、保険期間、対象物件です。これから、ソリューションと、claims-eligibility という名前のスタンドアロンな autonomous ローコードエージェントをスキャフォールドします。
+- ソリューションのスキャフォールドを作成できました。プロジェクトがソリューションのマニフェストに登録されるよう、その中にローコードエージェントのプロジェクトを追加します。
+- 実行したコマンド: `$ uip agent init claims-eligibility-solution/claims-eligibility --output json`
+- エージェントのスキャフォールドが正しく登録されました。生成された JSON ファイルを修正する前に内容を読み、サポートされているソースファイルだけを変更して、派生ファイルは refresh に再生成させるようにします。
+- ソース側に 2 か所の変更を加えます。スキャフォールドのプロンプトとスキーマを受理可否チェックの仕様に置き換えることと、Analyze Files 組み込みツールのリソースを追加することです。そのあとで uip agent refresh と uip agent validate を実行し、派生ファイルを手書きせず CLI に再生成させます。
+- いまプロンプト、添付ファイルのスキーマ、型付きの出力仕様、組み込みツールの定義を適用しています。プロンプトでは、ドキュメントの記載を超えた推測を明確に禁止し、最終的な補償の可否判断ではなく受理可否のスクリーニングに範囲を限定しています。
+- ソースファイルの修正が完了しました。まず JSON のパースチェックを行い、そのあとで UiPath の refresh / validation を実行して、entry-points.json と bindings_v2.json を手書きではなく生成させます。
+- JSON のパースが通りました。次に uip agent refresh を実行します。
+- スキーマは完全に一致しています。もう一度 CLI のマイグレーションを実行します。
+- マイグレーションが完了し、ビルダー用の成果物が生成されました。最終的なプロジェクト状態を確認するため、読み取り専用の検証を実行します。
+- 実行したコマンド: `$ uip agent validate claims-eligibility-solution/claims-eligibility --output json`
+- 検証に成功しました。作成したものと、PDF 添付を使ったテストに関する注意点を正確に報告できるよう、最後にファイルとステータスを確認します。
+- プロジェクトはローカルで有効であり、生成された .agent-builder ファイルも存在します。ビルド出力に Analyze Files リソースが確実に含まれるよう、生成されたバインディングを一度確認します。
 
-- Implemented the UiPath low-code autonomous agent claims-eligibility.
+- UiPath のローコード autonomous エージェント claims-eligibility を実装しました。
 
-Created solution and agent files under:
+作成したソリューションとエージェントのファイル:
 
 - claims-eligibility-solution/claims-eligibility/**agent.json**
 - claims-eligibility-solution/claims-eligibility/**resources/AnalyzeFiles/resource.json**
 - claims-eligibility-solution/claims-eligibility/**entry-points.json**
-    
-Configured:
 
-- Inputs: in_ClaimPDF, in_PolicyPDF as job-attachment PDF inputs.
-- Built-in Analyze Files tool using toolType: "analyze-attachments".
-- Output schema matching the requested 
-- out_isEligible, out_EligibilityAnalysisSummary, and nested out_EligibilityChecksJSON.
-- System prompt covering policy status, identity, address, coverage period, filing deadline, no unsupported inference, and property-claims eligibility best practices.
+設定内容:
+
+- 入力: in_ClaimPDF、in_PolicyPDF をジョブ添付の PDF 入力として設定
+- toolType: "analyze-attachments" を使用した組み込みの Analyze Files ツール
+- 依頼どおりの出力スキーマ
+- out_isEligible、out_EligibilityAnalysisSummary、ネストされた out_EligibilityChecksJSON
+- 保険証券ステータス、本人確認、住所、補償期間、請求期限、根拠のない推測の禁止、物件保険金請求の受理可否に関するベストプラクティスを網羅したシステムプロンプト
 
 </details>
 
-### 4. Upload and open in Studio Web
+### 4. アップロードして Studio Web で開く
 
-The agent is built and validated locally. Then ask:
+エージェントのビルドとローカル検証が完了しました。続けて次のように尋ねます。
+
 ```text
-Great! Whats the next step to run this agent in Studio Web?
+いいですね！ このエージェントを Studio Web で実行するには、次に何をすればよいですか？
 ```
 
-And Agent will recommend:
-```text 
-Upload the solution using:
+エージェントは次のように提案してくれます。
+
+```text
+以下のコマンドでソリューションをアップロードしてください:
 
    $ uip solution upload claims-eligibility-solution --output json
 
-That should return a DesignerUrl. 
+これで DesignerUrl が返ってくるはずです。
 
-Open that URL in Studio Web, open the claims-eligibility agent, and use the run/test experience to provide:
-   in_ClaimPDF: one of the claim PDFs in samples/
-   in_PolicyPDF: the matching policy PDF
+その URL を Studio Web で開き、claims-eligibility エージェントを開いて、run / test の画面で次の値を指定してください:
+   in_ClaimPDF: samples/ にある請求書 PDF のいずれか
+   in_PolicyPDF: それに対応する保険証券 PDF
 ```
 
-Run the command and follow the DesignerURL!
+コマンドを実行し、返ってきた DesignerURL を開いてみましょう。
 
-![Claude Code scaffolding the agent: solution created, agent initialized, schema configured](3-build-your-first-agent.images/fresh-from-oven.png){ .screenshot }
+![エージェントをスキャフォールドする Claude Code: ソリューションを作成し、エージェントを初期化し、スキーマを設定したところ](3-build-your-first-agent.images/fresh-from-oven.png){ .screenshot }
 
 
-Try running it against a claim and its policy, and read back a structured decision. After this you've done the whole cycle once — build, publish, run — and you're ready for the richer agents in the exercises that follow.
+請求書とその保険証券の組み合わせで実行し、構造化された判定結果を読み取ってみてください。ここまでで、構築・公開・実行という一連のサイクルを 1 周したことになります。以降の演習で扱う、より本格的なエージェントに進む準備が整いました。
 
-### 5. Run a sample claim
+### 5. サンプルの請求書を実行する
 
-In Studio Web, click on **Debug** provide the two file inputs and run the agent.
+Studio Web で **Debug** をクリックし、2 つのファイル入力を指定してエージェントを実行します。
 
-1. Set **in_ClaimPDF** to `CLM-2026-896147-claim.pdf`.
-2. Set **in_PolicyPDF** to `HO-3883873532.pdf`.
-3. Select **Run** (or **Save & Debug**).
+1. **in_ClaimPDF** に `CLM-2026-896147-claim.pdf` を指定します。
+2. **in_PolicyPDF** に `HO-3883873532.pdf` を指定します。
+3. **Run**（または **Save & Debug**）を選択します。
 
-When the run finishes, open the output — the three fields from the schema: `out_isEligible`, `out_EligibilityChecksJSON`, and `out_EligibilityAnalysisSummary`.
+実行が完了したら出力を開きます。スキーマで定義した 3 つのフィールド（`out_isEligible`、`out_EligibilityChecksJSON`、`out_EligibilityAnalysisSummary`）が確認できます。
 
-For claim `CLM-2026-896147`, the agent should land on **ineligible — deny**, because the claim was filed well past the 60-day deadline:
+請求 `CLM-2026-896147` の場合、エージェントは **受理不可（ineligible — deny）** と判断するはずです。この請求は 60 日の期限を大きく過ぎてから提出されているためです。
 
 ```json
 {
   "out_isEligible": false,
-  "out_EligibilityAnalysisSummary": "Claim CLM-2026-896147 is not eligible for assessment. Four of the five eligibility checks pass: the policy is current and paid in full, the claimant name matches the named insured, the property address matches, and the incident date of 14/04/2026 falls on the policy expiration date which is treated as inclusive. However, the filing deadline check fails: the claim was submitted 83 calendar days after the incident date, exceeding the 60-day filing requirement stated in the policy, and no delay explanation is provided anywhere in the claim form. Because the late filing is unjustified, the claim is ineligible.",
+  "out_EligibilityAnalysisSummary": "請求 CLM-2026-896147 は審査の対象として受理できません。5 つの受理可否チェックのうち 4 つは合格しています。保険証券は有効かつ保険料が全額支払済みであり、請求者名は記名被保険者と一致し、物件住所も一致しています。また事故日 14/04/2026 は保険証券の満了日にあたりますが、満了日当日は補償期間に含むものとして扱っています。一方で請求期限のチェックは不合格です。この請求は事故日から 83 暦日が経過してから提出されており、保険証券に定められた 60 日以内という提出要件を超えています。さらに、請求フォームのどこにも遅延の理由が記載されていません。遅延提出に正当な理由が示されていないため、この請求は受理できません。",
   "out_EligibilityChecksJSON": {
     "claim_id": "CLM-2026-896147",
     "policy_number": "HO-3883873532",
@@ -250,42 +252,42 @@ For claim `CLM-2026-896147`, the agent should land on **ineligible — deny**, b
     "checks": {
       "policy_status": {
         "result": "pass",
-        "detail": "Policy payment status is explicitly stated as 'Current - Paid in Full'."
+        "detail": "保険証券の支払いステータスは 'Current - Paid in Full' と明記されています。"
       },
       "identity_match": {
         "result": "pass",
         "claimant_name": "Mei Lin Tan",
         "policyholder_name": "Mei Lin Tan",
-        "detail": "Claimant name 'Mei Lin Tan' matches the named insured 'Mei Lin Tan' exactly."
+        "detail": "請求者名 'Mei Lin Tan' は記名被保険者 'Mei Lin Tan' と完全に一致しています。"
       },
       "address_match": {
         "result": "pass",
         "claim_address": "4/16 Chapel Street, St Kilda, VIC 3182",
         "policy_address": "4/16 Chapel Street, St Kilda, VIC 3182",
-        "detail": "Claim property address '4/16 Chapel Street, St Kilda, VIC 3182' matches the policy described property address exactly. report_address=N/A - no incident report in this exercise."
+        "detail": "請求書の物件住所 '4/16 Chapel Street, St Kilda, VIC 3182' は、保険証券に記載された対象物件の住所と完全に一致しています。report_address=N/A - no incident report in this exercise。"
       },
       "coverage_period": {
         "result": "pass",
         "incident_date": "14/04/2026",
         "effective_date": "14/04/2025",
         "expiration_date": "14/04/2026",
-        "detail": "Incident date 14/04/2026 falls on the policy expiration date, which is treated as inclusive. The incident date is within the coverage period of 14/04/2025 to 14/04/2026."
+        "detail": "事故日 14/04/2026 は保険証券の満了日にあたり、満了日当日は補償期間に含むものとして扱います。事故日は 14/04/2025 から 14/04/2026 までの補償期間内です。"
       },
       "filing_deadline": {
         "result": "fail",
         "incident_date": "14/04/2026",
         "claim_date": "06/07/2026",
         "days_elapsed": 83,
-        "detail": "83 calendar days elapsed between the incident date (14/04/2026) and the date of submission (06/07/2026), exceeding the 60-day filing deadline stated in Section III, Condition 1 of the policy. No delay explanation is provided in the claim form. Claim is ineligible due to unjustified late filing."
+        "detail": "事故日（14/04/2026）から提出日（06/07/2026）までに 83 暦日が経過しており、保険証券の Section III, Condition 1 に定められた 60 日の請求期限を超えています。請求フォームには遅延の理由が記載されていません。正当な理由のない遅延提出のため、この請求は受理できません。"
       }
     }
   }
 }
 ```
 
-!!! note "Exact wording will vary"
-    Since we are using LLMs, the `detail` and summary text are generated, so your wording won't match character-for-character. What should match is the structure and each check's `result`.
+!!! note "文言は毎回変わります"
+    LLM を使っているため、`detail` や要約のテキストは生成されるものであり、一字一句同じにはなりません。一致しているべきなのは構造と、各チェックの `result` です。
 
-You can experiment with the other claim samples.
+ほかの請求サンプルでも試してみてください。
 
-Done. You built an agent with Claude Code, published it, and ran it — your first full loop, and the foundation for everything that follows.
+これで完了です。Claude Code でエージェントを構築し、公開し、実行しました。最初の 1 周が終わり、これ以降のすべての土台ができました。

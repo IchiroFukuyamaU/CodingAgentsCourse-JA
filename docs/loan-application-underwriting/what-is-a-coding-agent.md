@@ -1,67 +1,67 @@
-# What's a Coding Agent?
-Learn how coding agents work and what makes them useful for UiPath automation work.
+# コーディングエージェントとは？
+コーディングエージェントの仕組みと、UiPath の自動化開発においてなぜ有用なのかを学びます。
 
-A coding agent is an AI assistant that reads, writes, and reasons about code — not just autocompletes it. Instead of suggesting the next line, it understands a goal described in plain English, explores the codebase, makes decisions, and generates entire working components. You stay in control: you review what it builds, ask it to adjust, and iterate until it's right.
+コーディングエージェントとは、コードを読み、書き、その意味を推論する AI アシスタントです。単なる入力補完ではありません。次の 1 行を提案するのではなく、平易な言葉で書かれたゴールを理解し、コードベースを調べ、判断を下し、動作するコンポーネントをまるごと生成します。主導権はあなたにあります。生成物をレビューし、修正を指示し、納得できるまで反復します。
 
-Several coding agents are available today, each with their own strengths:
+現在はいくつものコーディングエージェントが利用でき、それぞれに強みがあります。
 
-- **Claude Code** — Anthropic's CLI-based agent, runs in your terminal, deeply integrated with the file system. This is the one used in this exercise.
-- **Codex CLI** — OpenAI's command-line coding agent, similar terminal-first approach
-- **Cursor** — an IDE built around AI, tight editor integration with inline generation and multi-file context
-- **Gemini CLI** — Google's terminal agent, strong on reasoning and long context
-- **GitHub Copilot Agent** — embedded in VS Code and JetBrains, well suited for in-editor workflows
+- **Claude Code** — Anthropic の CLI ベースのエージェント。ターミナル上で動作し、ファイルシステムと深く統合されています。本演習で使用するのはこれです。
+- **Codex CLI** — OpenAI のコマンドライン型コーディングエージェント。同じくターミナル中心のアプローチです。
+- **Cursor** — AI を中心に設計された IDE。エディタとの統合が密で、インライン生成や複数ファイルにまたがるコンテキストに強みがあります。
+- **Gemini CLI** — Google のターミナル型エージェント。推論能力とロングコンテキストに強みがあります。
+- **GitHub Copilot Agent** — VS Code と JetBrains に組み込まれ、エディタ内で完結するワークフローに適しています。
 
-What makes coding agents especially powerful for UiPath work is the skill layer: by loading domain-specific knowledge about UiPath activities, APIs, and project conventions, the agent can generate production-ready automation code — not generic boilerplate. That's exactly what the UiPath skills in this exercise do.
+コーディングエージェントが UiPath の開発において特に強力になるのは、スキルのレイヤーがあるからです。UiPath のアクティビティ、API、プロジェクトの作法といったドメイン知識を読み込ませることで、エージェントは汎用的なひな型ではなく、本番で使える自動化コードを生成できるようになります。本演習で使う UiPath スキルは、まさにそのためのものです。
 
-## The Mental Model
+## 全体像（The Mental Model）
 
-Five concepts show up in every coding agent:
+どのコーディングエージェントにも、共通して次の 5 つの概念が登場します。
 
-| Concept | What it is |
+| 概念 | 内容 |
 |---|---|
-| **Tools** | Built-in actions the agent can take: read a file, run a bash command, search the web, edit code, etc. |
-| **Skills** | Domain knowledge bundles the agent loads when it sees a matching task. Like a playbook for one thing. |
-| **Commands** | Manual shortcuts you type: `/commit`, `/test`, `/deploy`. Triggered by you, not the agent. |
-| **Hooks** | Run automatically at lifecycle events: before an edit, after a commit, on session start. Used for guardrails. |
-| **Subagents** | Specialised workers spawned by the main agent. Used to parallelise or isolate complex tasks. |
+| **Tools（ツール）** | エージェントが実行できる組み込みのアクション。ファイルを読む、bash コマンドを実行する、Web を検索する、コードを編集する、など。 |
+| **Skills（スキル）** | 該当するタスクを見つけたときにエージェントが読み込む、ドメイン知識のバンドル。特定の作業に対する「手順書」のようなものです。 |
+| **Commands（コマンド）** | 自分で入力する手動のショートカット（`/commit`、`/test`、`/deploy` など）。エージェントではなく、あなたが起動します。 |
+| **Hooks（フック）** | ライフサイクルのイベント（編集前、コミット後、セッション開始時など）で自動的に実行されます。ガードレールとして使われます。 |
+| **Subagents（サブエージェント）** | メインのエージェントが起動する専門のワーカー。複雑なタスクを並列化したり、切り離して処理したりするために使います。 |
 
-!!! info "Plugins"
-    A plugin is a package that bundles any of these together — like a Marketplace app for your coding agent. The UiPath skills used in this exercise are plugins.
+!!! info "プラグイン（Plugins）"
+    プラグインは、これらをまとめてパッケージ化したものです。コーディングエージェント向けの Marketplace アプリのようなものと考えてください。本演習で使う UiPath スキルもプラグインです。
 
-## Tools, in practice
+## ツールの実際
 
-Claude Code's built-in tools are always available — no setup required:
+Claude Code の組み込みツールは常に利用可能で、セットアップは不要です。
 
-| Tool | What it does |
+| ツール | 機能 |
 |---|---|
-| **Read** | Read any file in your project |
-| **Edit / Write** | Modify or create files |
-| **Bash** | Execute shell commands |
-| **Glob / Grep** | Search across the codebase |
-| **WebSearch / WebFetch** | Look things up online |
-| **Task** | Spawn a subagent |
+| **Read** | プロジェクト内の任意のファイルを読む |
+| **Edit / Write** | ファイルを変更・作成する |
+| **Bash** | シェルコマンドを実行する |
+| **Glob / Grep** | コードベース全体を検索する |
+| **WebSearch / WebFetch** | オンラインで情報を調べる |
+| **Task** | サブエージェントを起動する |
 
-!!! info "Extension Tools (MCP)"
-    MCP (Model Context Protocol) is the standard way to give your coding agent new tools without changing the agent itself.
+!!! info "拡張ツール（MCP）"
+    MCP（Model Context Protocol）は、エージェント本体を変更することなく、コーディングエージェントに新しいツールを追加するための標準的な方法です。
 
-    - **GitHub MCP** — read issues, open PRs
-    - **Atlassian MCP** — Jira, Confluence
-    - **Slack MCP** — read channels, post messages
-    - **Custom UiPath MCP** — call Orchestrator, Maestro
+    - **GitHub MCP** — Issue の閲覧、PR の作成
+    - **Atlassian MCP** — Jira、Confluence
+    - **Slack MCP** — チャンネルの閲覧、メッセージの投稿
+    - **カスタム UiPath MCP** — Orchestrator や Maestro の呼び出し
 
-## Skills, in practice
+## スキルの実際
 
-A skill is a folder — sitting in `.claude/skills/` (or equivalent), with a `SKILL.md` inside.
+スキルは 1 つのフォルダーです。`.claude/skills/`（または同等の場所）に置かれ、中に `SKILL.md` が入っています。
 
-| Property | What it means |
+| 特性 | 意味 |
 |---|---|
-| **Discovered automatically** | The agent reads each `SKILL.md`'s description. When your prompt matches, it loads the full skill on demand. |
-| **More than just text** | Skills can bundle reference docs, code patterns, helper scripts, even compiled binaries the agent can run. |
-| **Scoped permissions** | A skill declares which tools it's allowed to use. Bash access can be tightly controlled. |
+| **自動的に検出される** | エージェントは各 `SKILL.md` の description を読みます。あなたのプロンプトと合致したときに、必要に応じてスキル全体を読み込みます。 |
+| **テキストだけではない** | スキルには、リファレンス文書、コードパターン、補助スクリプト、さらにはエージェントが実行できるコンパイル済みバイナリまで同梱できます。 |
+| **権限が限定される** | スキルは、使用を許可されたツールを宣言します。Bash へのアクセスも細かく制御できます。 |
 
-### What's in a SKILL.md file
+### SKILL.md ファイルの中身
 
-Every skill is built around a single `SKILL.md` file. Here's what one looks like:
+どのスキルも、1 つの `SKILL.md` ファイルを中心に構成されています。実際の例を見てみましょう。
 
 ```yaml
 ---
@@ -84,45 +84,45 @@ When the user asks for a new coded agent:
 - references/langgraph-patterns.md
 ```
 
-The file has four parts:
+このファイルは 4 つのパートで構成されています。
 
-| Part | What it does |
+| パート | 役割 |
 |---|---|
-| **Frontmatter** | Declares the skill's name, description, and which tools it's allowed to use. |
-| **Discovery prompt** | The `description` field is what the agent matches against your request — this is how the skill gets loaded automatically. |
-| **Instructions** | The body of the file: a step-by-step prompt the agent follows when the skill is active. |
-| **References** | Paths to files in the skill folder the agent can read for deeper context — API docs, code patterns, example projects. |
+| **フロントマター** | スキルの名前、説明、使用を許可するツールを宣言します。 |
+| **ディスカバリープロンプト** | `description` フィールドが、あなたの依頼と照合される部分です。ここでマッチすることでスキルが自動的に読み込まれます。 |
+| **手順（Instructions）** | ファイルの本文。スキルが有効なときにエージェントが従う、ステップバイステップのプロンプトです。 |
+| **リファレンス（References）** | より深いコンテキスト（API ドキュメント、コードパターン、サンプルプロジェクトなど）としてエージェントが読めるファイルへのパスです。 |
 
-## Where UiPath fits in this picture
+## この構図における UiPath の位置づけ
 
-UiPath ships a plugin for Claude Code. It bundles skills, hooks, and references — giving the agent domain knowledge about UiPath products out of the box.
+UiPath は Claude Code 向けのプラグインを提供しています。スキル、フック、リファレンスがまとめられており、UiPath 製品に関するドメイン知識を最初からエージェントに与えられます。
 
 ```bash
 npm -g install @uipath/cli
 uip skills install
 ```
 
-The plugin contains three things:
+プラグインには次の 3 つが含まれます。
 
-| What | Details |
+| 内容 | 詳細 |
 |---|---|
-| **10+ skills** | Domain knowledge for every UiPath product: `uipath-agents`, `uipath-coded-apps`, `uipath-rpa`, `uipath-maestro-flow`, `uipath-platform`, `uipath-test`, and more. |
-| **1 subagent** | `uipath-project-discovery-agent` — auto-runs on first contact with a UiPath project and builds context for the agent. |
-| **Hooks & references** | Session-start nudges, activity docs, and allowlists for safe read-only commands. |
+| **10 以上のスキル** | UiPath の各製品に対応したドメイン知識: `uipath-agents`、`uipath-coded-apps`、`uipath-rpa`、`uipath-maestro-flow`、`uipath-platform`、`uipath-test` など。 |
+| **1 つのサブエージェント** | `uipath-project-discovery-agent` — UiPath プロジェクトに最初に触れたときに自動実行され、エージェント向けのコンテキストを構築します。 |
+| **フックとリファレンス** | セッション開始時のガイド、アクティビティのドキュメント、安全な読み取り専用コマンドの許可リストなど。 |
 
-## The UiPath skill catalog
+## UiPath スキルカタログ
 
-The plugin includes skills for every part of the UiPath platform. Three of them drive the labs in this exercise:
+このプラグインには、UiPath プラットフォームのあらゆる領域に対応するスキルが含まれています。本演習のラボでは、そのうち 3 つを使用します。
 
-| Skill | Description |
+| スキル | 説明 |
 |---|---|
-| **`uipath-agents`** | Scaffold, build, run, evaluate, and deploy coded agents (LangGraph, LlamaIndex, OpenAI Agents) |
-| **`uipath-rpa`** | Generate and edit RPA workflows (XAML) for Studio Desktop with a discovery-first approach |
-| **`uipath-coded-apps`** | Push/pull TypeScript + React apps to Studio Web, pack & publish to Orchestrator |
-| `uipath-solution` | Create and deploy solutions |
-| `uipath-maestro-flow` | Create, validate, and debug UiPath Flow projects using the .flow JSON format |
-| `uipath-platform` | Auth, Orchestrator management, solution lifecycle, Integration Service, CLI tools |
-| `uipath-test` | Generate, run, and maintain automated test suites for UiPath projects |
+| **`uipath-agents`** | コーデッドエージェント（LangGraph、LlamaIndex、OpenAI Agents）のスキャフォールド、ビルド、実行、評価、デプロイ |
+| **`uipath-rpa`** | Studio Desktop 向けの RPA ワークフロー（XAML）を、まず調査するアプローチで生成・編集 |
+| **`uipath-coded-apps`** | TypeScript + React アプリの Studio Web へのプッシュ／プル、Orchestrator へのパック＆パブリッシュ |
+| `uipath-solution` | ソリューションの作成とデプロイ |
+| `uipath-maestro-flow` | .flow JSON 形式を使った UiPath Flow プロジェクトの作成、検証、デバッグ |
+| `uipath-platform` | 認証、Orchestrator の管理、ソリューションのライフサイクル、Integration Service、CLI ツール |
+| `uipath-test` | UiPath プロジェクト向けの自動テストスイートの生成、実行、保守 |
 
-!!! tip "Skills used in this exercise"
-    The three skills in bold — `uipath-agents`, `uipath-rpa`, and `uipath-coded-apps` — are the ones you'll use to build the loan underwriting pipeline.
+!!! tip "本演習で使うスキル"
+    太字の 3 つ（`uipath-agents`、`uipath-rpa`、`uipath-coded-apps`）が、ローン審査パイプラインの構築に使うスキルです。

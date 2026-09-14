@@ -1,127 +1,140 @@
-# UiPath Coding Agents Workshop — Site
+# UiPath Coding Agents ワークショップ（日本語版）— サイト
 
-Hands-on course teaching clients & partners to build UiPath agents and Maestro
-orchestrations with coding agents (Claude Code) and the `uip` CLI.
+コーディングエージェント（Claude Code）と `uip` CLI を使って、UiPath のエージェントと Maestro
+オーケストレーションを構築する方法を、お客様・パートナー様向けに学んでいただくためのハンズオン教材です。
 
-Built on the same MkDocs framework as the
-[Agentic Practice Workshop](https://github.com/uipath-practice/AgenticPracticeCourse),
-with three additions: a private knowledge base, a configurable training environment,
-and a CLI/KB-driven lesson-generation path alongside the screenshot path.
+> **原典について**
+> このリポジトリは、UiPath Partner Success が公開している
+> [uipath-practice/CodingAgentsCourse](https://github.com/uipath-practice/CodingAgentsCourse)
+> を日本語に翻訳したものです。構成・デザイン・演習内容は原典に準拠しています。
+> 原典の更新内容は、上流リポジトリを確認のうえ随時反映してください。
 
-## How it works
+[Agentic Practice Workshop](https://github.com/uipath-practice/AgenticPracticeCourse)
+と同じ MkDocs ベースのフレームワークを使用しており、次の 3 点が追加されています。
+非公開のナレッジベース、設定可能なトレーニング環境、そしてスクリーンショットに加えて
+CLI / KB からレッスンを生成する経路です。
+
+## 日本語版としての変更点
+
+| 項目 | 内容 |
+|---|---|
+| 本文・プロンプト | `docs/` 配下の公開ページをすべて日本語化。プロンプトも日本語ですが、網羅性・具体性は原典と同等に保っています |
+| 技術用語 | UiPath の製品名・機能名（Maestro、Orchestrator、Studio Web、Coded Agent など）、CLI コマンド、コード、識別子、スキーマのキー名は英語のまま |
+| フォント | 日本語は **Meiryo UI**、欧文は UiPath ブランドの Inter / Nunito（`docs/stylesheets/extra.css` のフォントスタック） |
+| サイト設定 | `theme.language: ja`、検索は lunr-languages の日本語トークナイザ（`plugins.search.lang: ja`） |
+| 構成 | ページ構成・セクション分け・デザインは原典のまま |
+
+## 仕組み
 
 ```
-../knowledge-base/  (private SSOT, NOT in this repo)
-        ↓  used as context to generate accurate lessons
-docs/*.md  →  MkDocs builds HTML  →  GitHub Actions  →  gh-pages  →  GitHub Pages
+../knowledge-base/  （非公開の SSOT。このリポジトリには含まれません）
+        ↓  正確なレッスンを生成するためのコンテキストとして使用
+docs/*.md  →  MkDocs が HTML をビルド  →  GitHub Actions  →  gh-pages  →  GitHub Pages
 ```
 
-| Path | Purpose |
+| パス | 用途 |
 |------|---------|
-| `docs/` | Published page content — one `.md` per page |
-| `mkdocs.yml` | Site config + **published** nav |
-| `mkdocs.local.yml` | Local-only nav incl. work-in-progress (gitignored) |
-| `main.py` | Environment variables (staging vs prod) for the training callout |
-| `Master/` | Authoring rules & templates (copied from base framework) |
-| `.claude/commands/` | Authoring slash commands (copied from base framework) |
-| `hooks/`, `scripts/` | Two-column hook; screenshot metadata pipeline (copied) |
-| `.github/workflows/deploy.yml` | Auto-deploy to GitHub Pages on push to `main` |
+| `docs/` | 公開ページの本文 — 1 ページにつき `.md` ファイル 1 つ |
+| `mkdocs.yml` | サイト設定と **公開用** のナビゲーション |
+| `mkdocs.local.yml` | ローカル専用のナビゲーション（作成中のページを含む。gitignore 対象） |
+| `main.py` | トレーニング環境の切り替え用変数（staging / prod） |
+| `Master/` | 執筆ルールとテンプレート（ベースフレームワークからコピー） |
+| `.claude/commands/` | 執筆用のスラッシュコマンド（ベースフレームワークからコピー） |
+| `hooks/`, `scripts/` | 2 カラム表示用フック、スクリーンショットのメタデータ処理（コピー） |
+| `.github/workflows/deploy.yml` | `main` への push で GitHub Pages に自動デプロイ |
 
-The knowledge base is intentionally kept **outside this public repo** (`../knowledge-base/`)
-so internal material is never published.
+ナレッジベースは、社内向けの内容が公開されることのないよう、意図的にこの公開リポジトリの
+**外側**（`../knowledge-base/`）に置いています。
 
-## First-time setup
+## 初回セットアップ
 
 ```bash
-# 1. Pull the reusable framework files from the base repo
+# 1. ベースリポジトリから再利用可能なフレームワークファイルを取得
 ./bootstrap-framework.sh
 
-# 2. Install dependencies
+# 2. 依存関係をインストール
 pip install -r requirements.txt
 
-# 3. Preview locally (authoring environment + WIP nav)
+# 3. ローカルでプレビュー（執筆用環境 + WIP ナビ）
 COURSE_ENV=staging mkdocs serve -f mkdocs.local.yml
-# open http://127.0.0.1:8000
+# http://127.0.0.1:8000 を開く
 
-# 4. Release-equivalent build check
+# 4. リリース相当のビルド確認
 COURSE_ENV=prod mkdocs build
 ```
 
-## Publishing to GitHub
-
-This repo is scaffolded locally. To create the remote and deploy:
+## GitHub への公開
 
 ```bash
-cd coding-agents-course
-git init && git add . && git commit -m "Initial scaffold"
-gh repo create uipath-practice/CodingAgentsCourse --public --source=. --push
-# then enable GitHub Pages on the gh-pages branch (created by the deploy workflow)
+git init && git add . && git commit -m "Initial commit"
+gh repo create <YOUR-GITHUB-USERNAME>/CodingAgentsCourse-JA --public --source=. --push
 ```
 
-## Trainer Notes (Internal)
+`main` への push で `.github/workflows/deploy.yml` が走り、`gh-pages` ブランチにデプロイされます。
+リポジトリの **Settings → Pages** で、ソースが `gh-pages` ブランチになっていることを確認してください。
 
-This section is for trainers/facilitators only. It stays in this README rather
-than `docs/` because GitHub Pages has no way to restrict access by email —
-anything admin-only needs to live in the repo itself, not on the public site.
-Do not move this content into `docs/` or reference it from
-`mkdocs.yml`/`mkdocs.local.yml`.
+公開後は、`mkdocs.yml` の `site_url` を実際の公開 URL に更新してください。
 
-### Environment & Tenant Setup
+## トレーナー向けメモ（内部向け）
 
-The site's `main.py` defines a `COURSE_ENV` switch with two profiles (`staging`
-and `prod`) driving the `{{ training_url }}` / `{{ training_tenant }}` macros
-used throughout the lessons. In practice, only the cloud environment below is
-real — there is no separate staging UiPath org/tenant to author or test
-against. Treat the `staging` profile in `main.py` as unused/vestigial.
+このセクションはトレーナー／ファシリテーター向けです。GitHub Pages にはメールアドレス単位で
+アクセスを制限する仕組みがないため、管理者のみが参照すべき内容は `docs/` ではなくこの README に
+置いています。この内容を `docs/` に移動したり、`mkdocs.yml` / `mkdocs.local.yml` から参照したり
+しないでください。
 
-| Organization | URL | Tenant | Used for |
+### 環境とテナントのセットアップ
+
+サイトの `main.py` には `COURSE_ENV` による 2 つのプロファイル（`staging` と `prod`）が定義されており、
+レッスン全体で使われる `{{ training_url }}` / `{{ training_tenant }}` マクロを切り替えます。
+ただし実際に存在するのは下記のクラウド環境だけで、執筆やテスト用の独立した staging の UiPath
+組織／テナントはありません。`main.py` の `staging` プロファイルは未使用・名残と考えてください。
+
+| 組織 | URL | テナント | 用途 |
 |---|---|---|---|
-| `tpenlabs` | https://cloud.uipath.com/tpenlabs | `CodingAgentsPractice` | The one real environment — both authoring/testing and the live participant-facing environment (CI builds with `COURSE_ENV=prod`) |
+| `tpenlabs` | https://cloud.uipath.com/tpenlabs | `CodingAgentsPractice` | 唯一の実環境。執筆・テストと、受講者が実際に使う環境の両方を兼ねる（CI は `COURSE_ENV=prod` でビルド） |
 
-All exercises operate inside a single shared Orchestrator folder in this
-org/tenant (`tpenlabs` / `CodingAgentsPractice`):
+すべての演習は、この組織／テナント（`tpenlabs` / `CodingAgentsPractice`）内の単一の共有
+Orchestrator フォルダーで実施します。
 
-- **Folder name:** `CodingAgentsILT`
-- **Folder key:** `c30345cd-5543-46a9-b42b-0354e60b4f15`
+- **フォルダー名:** `CodingAgentsILT`
+- **フォルダーキー:** `c30345cd-5543-46a9-b42b-0354e60b4f15`
 
-Every deployable artifact (agent, coded app, Maestro flow, RPA process) is
-named with a `{YourName}` prefix (e.g. `{YourName}LoanUnderwritingAgent`) so
-participants sharing the same tenant/folder don't collide with each other's
-packages, processes, or Orchestrator entities.
+デプロイする成果物（エージェント、コーデッドアプリ、Maestro フロー、RPA プロセス）には、すべて
+`{YourName}` プレフィックスを付けます（例: `{YourName}LoanUnderwritingAgent`）。同じテナント／
+フォルダーを共有する受講者同士で、パッケージ・プロセス・Orchestrator のエンティティが
+衝突しないようにするためです。
 
-### Inviting Participants
+### 受講者の招待
 
-Before a cohort starts, invite each participant to the `tpenlabs` org so they
-can log in with their own email:
+コホート開始前に、各受講者が自分のメールアドレスでログインできるよう、`tpenlabs` 組織に
+招待してください。
 
-1. In the `tpenlabs` org, go to the **Admin** tab.
-2. Go to **Accounts and Local Groups**.
-3. Invite each participant using their email address.
-4. Make sure each invited participant is added to the **CodingAgentsGroup**
-   local group — this is what grants them access to the `CodingAgentsPractice`
-   tenant and the `CodingAgentsILT` folder.
+1. `tpenlabs` 組織の **Admin** タブを開きます。
+2. **Accounts and Local Groups** に移動します。
+3. 各受講者をメールアドレスで招待します。
+4. 招待した受講者が **CodingAgentsGroup** ローカルグループに追加されていることを確認します。
+   これにより `CodingAgentsPractice` テナントと `CodingAgentsILT` フォルダーへのアクセスが
+   付与されます。
 
-### Before Each Training
+### 各トレーニングの前に
 
-- [ ] Confirm the **LoanUnderwriting** storage bucket exists in the
-      **CodingAgentsILT** folder in Orchestrator — the RPA lesson (Application
-      Intake & Enrichment) uploads results there, and the run fails if it's
-      missing.
+- [ ] Orchestrator の **CodingAgentsILT** フォルダーに **LoanUnderwriting** ストレージバケットが
+      存在することを確認する。RPA のレッスン（申込受付とデータ補完）が結果をここにアップロードするため、
+      存在しないと実行が失敗します。
 
-### TODO — fill in before the next cohort
+### TODO — 次回のコホートまでに埋める
 
-- [ ] Is there a reset/cleanup step needed between cohorts (stale processes,
-      packages, jobs, Action Center tasks left in the shared folder from the
-      previous run)? Document the steps or the script here.
-- [ ] Any UiBank API seed-data reset needed, or is `https://uibank-api.uipath.com`
-      stable/shared indefinitely across cohorts?
-- [ ] Who to contact if a participant needs their credentials/tenant access
-      re-issued mid-workshop?
+- [ ] コホート間でリセット／クリーンアップの手順は必要か（共有フォルダーに前回分のプロセス、
+      パッケージ、ジョブ、Action Center のタスクが残る）。必要な手順やスクリプトをここに記載する。
+- [ ] UiBank の初期データのリセットは必要か。それとも `https://uibank-api.uipath.com` は
+      コホートをまたいで安定して共有できるか。
+- [ ] ワークショップの途中で受講者の資格情報／テナントアクセスを再発行する必要が生じた場合の
+      連絡先は誰か。
 
-### Timing & Agenda
+### タイムテーブルとアジェンダ
 
-_Not yet documented — add suggested pacing per lesson here._
+_未整備 — レッスンごとの推奨ペースをここに追記してください。_
 
-### Answer Keys / Expected Outputs
+### 解答例／期待される出力
 
-_Not yet documented — add reference solutions / expected results here._
+_未整備 — 参照実装や期待される結果をここに追記してください。_

@@ -1,59 +1,58 @@
-# Loan Officer Review Dashboard
-Use the `uipath-coded-apps` skill to generate a React Coded Action App that renders inside Maestro's human task review — showing the AI credit assessment and letting the loan officer approve or reject the application.
+# ローン担当者レビュー用ダッシュボード
+`uipath-coded-apps` スキルを使って、Maestro の人的タスク（Human Task）のレビュー画面内でレンダリングされる React 製の Coded Action App を生成します。AI による与信審査の結果を表示し、ローン担当者が申込を承認または却下できるようにします。
 
-## 1. Open Your Project Folder in Your Coding Agent
+## 1. プロジェクトフォルダーをコーディングエージェントで開く
 
-Create an empty folder called `{yourname}loanofficerdashboard` and open it in your coding agent (e.g. Claude Code, Codex):
+`{yourname}loanofficerdashboard` という名前の空のフォルダーを作成し、コーディングエージェント（Claude Code、Codex など）で開きます。
 
 ```bash
 mkdir {yourname}loanofficerdashboard
 ```
 
-## 2. Describe the App
+## 2. アプリの内容を説明する
 
-Give your coding agent a plain-English description of what to build. Be specific about what the officer sees, where the data comes from, and what the decision buttons do:
+作りたいものを、コーディングエージェントに平易な言葉で説明します。担当者に何が見えるのか、データはどこから来るのか、判断ボタンが何をするのかを具体的に伝えてください。
 
 ```text
-Build a Coded Action App using UiPath TypeScript SDK called
-{yourname}loanofficerdashboardApp. It should:
+UiPath TypeScript SDK を使って、{yourname}loanofficerdashboardApp という名前の
+Coded Action App を構築してください。要件は次のとおりです:
 
-1. Receives twelve inputs: LoanId (string), ApplicantFirstName (string),
-   ApplicantLastName (string), LoanAmount (number), LoanTerm (number),
-   YearlyIncome (number) — passed from the Maestro process — and the six
-   outputs of the coded agent: CreditScore (number, 0–100), RiskBand
-   (string — Low / Medium / High), AssessmentSummary (string),
-   MonthlyRepayment (number), DebtToIncomeRatio (number), and
-   LoanToMarketRatio (number)
-2. Display a two-panel dashboard: left panel shows the applicant name, LoanId,
-   loan amount, loan term, and yearly income; right panel shows CreditScore as
-   a progress bar, RiskBand as a colour-coded badge (green = Low, yellow =
-   Medium, red = High), AssessmentSummary as a text block, and the three
-   financial metrics (monthly repayment, debt-to-income ratio,
-   loan-to-market ratio) as labelled values
-3. Provide an optional Notes text area for the loan officer to add comments
-4. Let the loan officer submit a decision via Approve (green) or Reject (red)
-   buttons — defined as outcomes in action-schema.json, no external API calls
-   needed
+1. 12 個の入力を受け取る: LoanId（string）、ApplicantFirstName（string）、
+   ApplicantLastName（string）、LoanAmount（number）、LoanTerm（number）、
+   YearlyIncome（number）— これらは Maestro プロセスから渡されます — に加えて、
+   コーデッドエージェントの 6 つの出力: CreditScore（number、0〜100）、RiskBand
+   （string — Low / Medium / High）、AssessmentSummary（string）、
+   MonthlyRepayment（number）、DebtToIncomeRatio（number）、
+   LoanToMarketRatio（number）
+2. 2 ペイン構成のダッシュボードを表示する: 左ペインには申込者名、LoanId、
+   借入額、借入期間、年収を表示し、右ペインには CreditScore をプログレスバーで、
+   RiskBand を色分けしたバッジで（緑 = Low、黄 = Medium、赤 = High）、
+   AssessmentSummary をテキストブロックで、さらに 3 つの財務指標
+   （月々の返済額、債務所得比率、市場平均に対する借入額の比率）を
+   ラベル付きの値として表示する
+3. ローン担当者がコメントを追加できる、任意入力の Notes テキストエリアを用意する
+4. ローン担当者が Approve（緑）または Reject（赤）のボタンで判断を送信できるようにする。
+   これらは action-schema.json の outcomes として定義し、外部 API の呼び出しは不要とする
 ```
 
-Your coding agent reads the `uipath-coded-apps` skill context and generates a complete app project:
+コーディングエージェントは `uipath-coded-apps` スキルのコンテキストを読み取り、完全なアプリプロジェクトを生成します。
 
-- `src/App.tsx` — the main React component with the two-panel layout
-- `action-schema.json` — defines all inputs and the `Approve`/`Reject` outcomes
-- `package.json` — project dependencies
-- `vite.config.ts` — Vite config with `base: './'`
+- `src/App.tsx` — 2 ペインレイアウトを持つメインの React コンポーネント
+- `action-schema.json` — すべての入力と `Approve` / `Reject` の outcomes を定義
+- `package.json` — プロジェクトの依存関係
+- `vite.config.ts` — `base: './'` を設定した Vite の設定ファイル
 
-## 3. Review the Generated Code
+## 3. 生成されたコードをレビューする
 
-Open the project in your IDE. You should see:
+プロジェクトを IDE で開きます。次の内容が確認できるはずです。
 
-- **`action-schema.json`** — `inputs` section with `LoanId`, `CreditScore`, `RiskBand`, `AssessmentSummary`, and `outcomes` section with `Approve` and `Reject`
-- **`App.tsx`** — two-panel layout, progress bar for the credit score, colour-coded risk badge, inputs read directly from the action schema context
+- **`action-schema.json`** — `inputs` セクションに `LoanId`、`CreditScore`、`RiskBand`、`AssessmentSummary` があり、`outcomes` セクションに `Approve` と `Reject` がある
+- **`App.tsx`** — 2 ペインレイアウト、クレジットスコアのプログレスバー、色分けされたリスクバッジ。入力はアクションスキーマのコンテキストから直接読み取られている
 
-## 4. Run Locally
+## 4. ローカルで実行する
 
 !!! note
-    Run these commands inside the app folder. Navigate to it first:
+    以下のコマンドはアプリのフォルダー内で実行してください。まず移動します。
     ```bash
     cd LoanOfficerDashboard
     ```
@@ -63,7 +62,7 @@ npm install
 npm run dev
 ```
 
-When the server starts successfully you should see:
+サーバーが正常に起動すると、次のように表示されます。
 
 ```text
   VITE v8.0.16  ready in 308 ms
@@ -73,29 +72,29 @@ When the server starts successfully you should see:
   ➜  press h + enter to show help
 ```
 
-Opening `http://localhost:5174/` directly will show the app layout with no data — fields will be empty since no parameters are passed. The port may vary (5173, 5174, etc.) — use whichever Vite reports in the terminal.
+`http://localhost:5174/` を直接開くと、データのない状態のレイアウトが表示されます。パラメーターが渡されていないため、各フィールドは空です。ポート番号は環境によって異なります（5173、5174 など）。ターミナルに表示された番号を使ってください。
 
-### Workshop prompt — demo mode
+### ワークショップ用プロンプト — デモモード
 
-For a richer local preview with interactive buttons and no Action Center dependency, ask your coding agent:
+Action Center に依存せず、操作可能なボタン付きでもう少しリッチにローカルプレビューしたい場合は、コーディングエージェントに次のように依頼します。
 
 ```text
-Start a local test version of the Coded Action App and provide a clickable URL
-where I can preview the interface with realistic dummy data.
+Coded Action App のローカルテスト版を起動し、現実的なダミーデータでインターフェイスを
+プレビューできるクリック可能な URL を教えてください。
 
-Add a safe demo mode that:
+次の条件を満たす安全なデモモードを追加してください:
 
-- Works only on localhost and does not require an Action Center task
-- Populates every input defined in action-schema.json
-- Keeps notes, theme switching, and outcome buttons interactive
-- Does not call UiPath APIs or complete a real task
-- Leaves normal production behavior unchanged
+- localhost でのみ動作し、Action Center のタスクを必要としない
+- action-schema.json に定義されたすべての入力に値を設定する
+- Notes、テーマ切り替え、outcome のボタンは操作可能なままにする
+- UiPath の API を呼び出したり、実際のタスクを完了させたりしない
+- 通常の本番時の挙動は一切変更しない
 
-Rebuild and lint the app, start the local development server, verify the URL
-returns HTTP 200, and give me the clickable demo URL.
+アプリを再ビルドして lint を実行し、ローカル開発サーバーを起動して、その URL が HTTP 200 を
+返すことを確認したうえで、クリック可能なデモ URL を教えてください。
 ```
 
-## 5. Build, Pack, and Publish
+## 5. ビルド・パック・パブリッシュ
 
 ```bash
 npm run build
@@ -103,31 +102,30 @@ uip codedapp pack dist -n {yourname}loanofficerdashboard --version 1.0.0
 uip codedapp publish -t Action
 ```
 
-The `-t Action` flag is required — it registers the app as a Coded Action App so Maestro can route human tasks to it.
+`-t Action` フラグは必須です。これによってアプリが Coded Action App として登録され、Maestro が人的タスクをこのアプリに振り向けられるようになります。
 
-## 6. Deploy to Orchestrator
+## 6. Orchestrator にデプロイする
 
 ```bash
 uip codedapp deploy -n {yourname}loanofficerdashboard --folder-key <CodingAgentsILT-folder-key>
 ```
 
-For example:
+例:
 
 ```bash
 uip codedapp deploy -n {yourname}loanofficerdashboard --folder-key c30345cd-5543-46a9-b42b-0354e60b4f15
 ```
 
-To find the folder key for CodingAgentsILT:
+CodingAgentsILT のフォルダーキーを調べるには、次を実行します。
 
 ```bash
 uip or folders list --output json
 ```
 
-Look for the entry where `Name` is `CodingAgentsILT` and copy its `Key` value.
+`Name` が `CodingAgentsILT` のエントリーを探し、その `Key` の値をコピーしてください。
 
-The app is now live. In Lesson 3, Maestro pauses at the human review step and renders this app for the loan officer to complete.
+これでアプリが有効になりました。レッスン 3 では、Maestro が人的レビューのステップで一時停止し、ローン担当者が入力できるようにこのアプリをレンダリングします。
 
-### Verify the Deployment
+### デプロイを確認する
 
-In **Orchestrator**, go to your **CodingAgentsILT** folder → **Apps**, and check that `{yourname}loanofficerdashboard` shows up there as successfully deployed.
-
+**Orchestrator** で **CodingAgentsILT** フォルダー → **Apps** を開き、`{yourname}loanofficerdashboard` が正常にデプロイされて表示されていることを確認してください。
