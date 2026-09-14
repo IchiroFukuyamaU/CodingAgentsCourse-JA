@@ -89,7 +89,10 @@ gh repo create CodingAgentsCourse-JA --public --source=. --remote=origin --push
 サイトの `main.py` には `COURSE_ENV` による 2 つのプロファイル（`staging` と `prod`）が定義されており、
 レッスン全体で使われる `{{ training_url }}` / `{{ training_tenant }}` マクロを切り替えます。
 ただし実際に存在するのは下記のクラウド環境だけで、執筆やテスト用の独立した staging の UiPath
-組織／テナントはありません。`main.py` の `staging` プロファイルは未使用・名残と考えてください。
+組織／テナントはありません。`staging.uipath.com` は本コースのサポート対象外のため、日本語版では
+`staging` プロファイルも `prod` と同じクラウド環境（`cloud.uipath.com`）を指すようにしてあります。
+`COURSE_ENV=staging` でのローカルプレビューはこれまでどおり動作しますが、サポート対象外の URL が
+レッスン本文に混入することはありません。
 
 | 組織 | URL | テナント | 用途 |
 |---|---|---|---|

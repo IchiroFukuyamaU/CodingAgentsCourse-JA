@@ -22,10 +22,14 @@ Default is "prod" so a plain build is release-safe.
 import os
 
 ENVIRONMENTS = {
+    # staging.uipath.com is not a supported environment for this course, so the
+    # "staging" profile points at the same cloud environment as "prod". The
+    # profile is kept only so `COURSE_ENV=staging mkdocs serve` still works for
+    # authoring; it no longer injects an unsupported URL into the lessons.
     "staging": {
-        "training_url": "https://staging.uipath.com/partnersuccess",
-        "training_tenant": "Workshops",
-        "env_label": "Staging (build & preview)",
+        "training_url": "https://cloud.uipath.com/tpenlabs",
+        "training_tenant": "CodingAgentsPractice",
+        "env_label": "Authoring & preview (cloud)",
     },
     "prod": {
         "training_url": "https://cloud.uipath.com/tpenlabs",

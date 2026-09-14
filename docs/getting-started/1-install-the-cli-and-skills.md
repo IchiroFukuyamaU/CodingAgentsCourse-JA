@@ -62,10 +62,10 @@ uip skills install --agent claude
 uip login status
 ```
 
-別の環境に接続する。
+別の組織・テナントに接続する。
 
 ```bash
-uip login --authority https://staging.uipath.com -t <TenantName>
+uip login --authority https://cloud.uipath.com --organization <OrgName> -t <TenantName>
 ```
 
 バージョンを確認し、ツールを最新に保つ。
