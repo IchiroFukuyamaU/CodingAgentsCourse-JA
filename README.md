@@ -65,15 +65,17 @@ COURSE_ENV=prod mkdocs build
 
 ## GitHub への公開
 
+手順の詳細は **[PUBLISH-JA.md](PUBLISH-JA.md)** を参照してください。要点だけ挙げると、
+
 ```bash
-git init && git add . && git commit -m "Initial commit"
-gh repo create <YOUR-GITHUB-USERNAME>/CodingAgentsCourse-JA --public --source=. --push
+gh repo create CodingAgentsCourse-JA --public --source=. --remote=origin --push
 ```
 
 `main` への push で `.github/workflows/deploy.yml` が走り、`gh-pages` ブランチにデプロイされます。
 リポジトリの **Settings → Pages** で、ソースが `gh-pages` ブランチになっていることを確認してください。
 
-公開後は、`mkdocs.yml` の `site_url` を実際の公開 URL に更新してください。
+`site_url` は GitHub Actions がリポジトリ情報から自動的に組み立てて渡すため、`mkdocs.yml` を手で
+書き換える必要はありません。
 
 ## トレーナー向けメモ（内部向け）
 

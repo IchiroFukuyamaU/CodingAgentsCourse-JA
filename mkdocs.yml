@@ -1,5 +1,7 @@
 site_name: UiPath Coding Agents ワークショップ
-site_url: https://YOUR-GITHUB-USERNAME.github.io/CodingAgentsCourse-JA/
+# 公開 URL は GitHub Actions が SITE_URL 環境変数として渡します（.github/workflows/deploy.yml）。
+# ローカルビルド時は既定値が使われるため、手で書き換える必要はありません。
+site_url: !ENV [SITE_URL, 'http://127.0.0.1:8000/']
 site_description: コーディングエージェントを使って UiPath のエージェントと Maestro オーケストレーションを構築する、実践型ハンズオン教材（日本語版）
 site_author: Sergey Shumilov
 
