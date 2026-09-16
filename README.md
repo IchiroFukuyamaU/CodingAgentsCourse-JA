@@ -65,11 +65,18 @@ COURSE_ENV=prod mkdocs build
 
 ## GitHub への公開
 
+公開先: **<https://github.com/UiPathPartnersJPN/CodingAgentsCourse-JA>**
+公開 URL: **<https://uipathpartnersjpn.github.io/CodingAgentsCourse-JA/>**
+
 手順の詳細は **[PUBLISH-JA.md](PUBLISH-JA.md)** を参照してください。要点だけ挙げると、
 
 ```bash
-gh repo create CodingAgentsCourse-JA --public --source=. --remote=origin --push
+git remote set-url origin https://github.com/UiPathPartnersJPN/CodingAgentsCourse-JA.git
+git push origin main
 ```
+
+> ブラウザの「Upload files」はサブフォルダーと隠しフォルダー（`docs/`、`.github/` など）を
+> 取りこぼすため使わないでください。詳細は PUBLISH-JA.md 冒頭の注意書きを参照してください。
 
 `main` への push で `.github/workflows/deploy.yml` が走り、`gh-pages` ブランチにデプロイされます。
 リポジトリの **Settings → Pages** で、ソースが `gh-pages` ブランチになっていることを確認してください。

@@ -21,8 +21,17 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      # GitHub Pages hostnames are lowercase, so the owner is lowercased here
+      # (e.g. UiPathPartnersJPN -> uipathpartnersjpn). The repository name keeps
+      # its original casing, because the path segment is case-sensitive.
+      - name: Resolve the Pages URL
+        id: pages
+        run: |
+          owner=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          echo "site_url=https://${owner}.github.io/${{ github.event.repository.name }}/" >> "$GITHUB_OUTPUT"
+
       - name: Build & deploy (production environment)
         env:
           COURSE_ENV: prod
-          SITE_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
+          SITE_URL: ${{ steps.pages.outputs.site_url }}
         run: mkdocs gh-deploy --force
