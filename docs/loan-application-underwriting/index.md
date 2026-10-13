@@ -186,8 +186,8 @@ UiBank には毎日ローンの申込が届きます。1 件ごとに与信審�
 導入手順は[第1部の「0. 前提ソフトウェアを準備する」](../getting-started/0-prerequisites.md)にあります。
 
 !!! tip "演習環境"
-    **[{{ training_url }}]({{ training_url }})** にテナント **{{ training_tenant }}** でログインします。
-    デプロイするものはすべて、**Orchestrator** のフォルダー **{{ practice_folder }}** に配置します。
+    **ご自身の UiPath テナント**で進めます。デプロイするものはすべて、**Orchestrator** のフォルダー
+    **{{ practice_folder }}** に配置します。
 
 !!! warning "LLM の利用料について"
     第2部のレッスン1 と レッスン3・4 は、同じエージェントを複数回実行するため、相応のトークンを消費します。

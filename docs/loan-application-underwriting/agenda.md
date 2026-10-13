@@ -55,8 +55,8 @@ monthly_repayment / debt_to_income_ratio / loan_to_market_ratio
 ## 演習環境
 
 !!! tip "演習環境"
-    **[{{ training_url }}]({{ training_url }})** にテナント **{{ training_tenant }}** でログインします。
-    デプロイするものはすべて、**Orchestrator** のフォルダー **{{ practice_folder }}** に配置します。このフォルダーは[次の章](0-environment-setup.md)で自分で作成します。
+    **ご自身の UiPath テナント**で進めます。デプロイするものはすべて、**Orchestrator** のフォルダー
+    **{{ practice_folder }}** に配置します。このフォルダーは[次の章](0-environment-setup.md)で自分で作成します。
 
 ## つまずいたら
 

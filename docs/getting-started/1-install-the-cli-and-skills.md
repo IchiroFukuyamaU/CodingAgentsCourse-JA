@@ -43,6 +43,9 @@ uip --version
 {{ login_command }}
 ```
 
+`{{ org_name }}` と `{{ training_tenant }}` は、**ご自身の組織名・テナント名に置き換えてください。**
+Automation Cloud の画面右上、または URL（`https://cloud.uipath.com/<組織名>/<テナント名>/...`）から確認できます。
+
 ブラウザーが開くのでサインインしてください。
 
 !!! warning "ログインは自分のターミナルで実行してください"
