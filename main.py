@@ -1,47 +1,68 @@
 """
-MkDocs-macros module: injects the training-environment values into pages.
+MkDocs-macros モジュール — 演習環境の値をページに注入します。
 
-Why this exists
----------------
-The training environment differs between building and release:
-  - staging  -> used while authoring, so live lessons are never disrupted
-  - prod     -> the real participant environment
+なぜこれがあるのか
+------------------
+組織名・テナント名・フォルダー名などは利用者ごとに違います。
+本文に直書きすると、別のテナントで使うときに全ページを書き換えることになります。
+そこでページ側では変数を参照し、値はこのファイルだけで管理します。
 
-Pages reference the variables instead of hardcoding URLs/tenants, e.g.:
+    Orchestrator の **{{ practice_folder }}** フォルダーを開きます。
 
-    !!! tip "Training Environment"
-        Log in at **[{{ training_url }}]({{ training_url }})** using tenant **{{ training_tenant }}**.
+環境はビルド時に COURSE_ENV で切り替えます。
 
-Switch environments at build time with the COURSE_ENV variable:
-    COURSE_ENV=staging mkdocs serve     # author/preview
-    COURSE_ENV=prod    mkdocs build     # release (CI uses this)
+    COURSE_ENV=staging mkdocs serve     # 検証環境（既定）
+    COURSE_ENV=prod    mkdocs build     # 顧客提供環境
 
-Default is "prod" so a plain build is release-safe.
+自分のテナントで使うには
+------------------------
+下の ENVIRONMENTS の値を書き換えるだけです。本文側は変更不要です。
 """
 
 import os
 
 ENVIRONMENTS = {
-    # staging.uipath.com is not a supported environment for this course, so the
-    # "staging" profile points at the same cloud environment as "prod". The
-    # profile is kept only so `COURSE_ENV=staging mkdocs serve` still works for
-    # authoring; it no longer injects an unsupported URL into the lessons.
+    # 検証環境（2026-10 に全レッスンの動作を確認した環境）
     "staging": {
-        "training_url": "https://cloud.uipath.com/tpenlabs",
-        "training_tenant": "CodingAgentsPractice",
-        "env_label": "Authoring & preview (cloud)",
+        "cloud_host": "https://staging.uipath.com",
+        "org_name": "fukuyamasandboxenv",
+        "training_tenant": "DefaultTenant",
+        "env_label": "検証環境（staging）",
     },
+    # 顧客提供環境。公開前にここを自社の値へ差し替えてください。
     "prod": {
-        "training_url": "https://cloud.uipath.com/tpenlabs",
-        "training_tenant": "CodingAgentsPractice",
-        "env_label": "Production",
+        "cloud_host": "https://cloud.uipath.com",
+        "org_name": "CHANGE-ME-org",
+        "training_tenant": "CHANGE-ME-tenant",
+        "env_label": "本番環境（cloud）",
     },
+}
+
+# 環境によらず共通の値。演習で作成するリソースの名前です。
+COMMON = {
+    "practice_folder": "CodingAgentsWorkshop",
+    "storage_bucket": "LoanUnderwriting",
+    "uibank_api": "https://uibank-api.uipath.com",
+    "uibank_swagger": "https://uibank-api.uipath.com/explorer/swagger.json",
+    # 学習者からの問い合わせ窓口。自社の窓口に差し替えてください。
+    "contact": "（自社の問い合わせ窓口に差し替えてください）",
 }
 
 
 def define_env(env):
-    profile = os.getenv("COURSE_ENV", "prod").lower()
-    cfg = ENVIRONMENTS.get(profile, ENVIRONMENTS["prod"])
+    profile = os.getenv("COURSE_ENV", "staging").lower()
+    cfg = ENVIRONMENTS.get(profile, ENVIRONMENTS["staging"])
+
     for key, value in cfg.items():
         env.variables[key] = value
+    for key, value in COMMON.items():
+        env.variables[key] = value
+
     env.variables["course_env"] = profile
+
+    # 組み立て値 — 本文で何度も使うため、ここで作っておきます。
+    env.variables["training_url"] = f"{cfg['cloud_host']}/{cfg['org_name']}"
+    env.variables["login_command"] = (
+        f"uip login --authority {cfg['cloud_host']}/{cfg['org_name']} "
+        f"-t {cfg['training_tenant']}"
+    )
