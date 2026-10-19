@@ -256,16 +256,23 @@ UiBank の Swagger ドキュメントを開いて内容を確認してくださ�
 
 まず仮想環境を有効化します。
 
-=== "Windows (PowerShell)"
-    必要に応じて、先にスクリプトの実行を許可します。
-    ```powershell
-    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-    .\.venv\Scripts\Activate.ps1
-    ```
+!!! info "何のために有効化するのか"
+    次に実行する `uip codedagent setup` は、**`uip` が使う Python の場所を記録します。** 有効化しておくと、
+    手順2 でコーディングエージェントが作った `.venv` の Python が記録されます。
+
+    **コーディングエージェント（Claude Code など）にコマンドを実行させている場合、通常は不要です。**
+    エージェントは `.venv` の Python を直接使うためです。**自分で新しいターミナルを開いて実行する場合は、
+    有効化してください。** 別の Python が記録されると、`init` で import エラーが出たり、入出力スキーマが
+    正しく生成されなかったりすることがあります。
 
 === "Windows (コマンドプロンプト)"
     ```bat
     .venv\Scripts\activate
+    ```
+
+=== "Windows (PowerShell)"
+    ```powershell
+    .\.venv\Scripts\Activate.ps1
     ```
 
 === "Mac / Linux"
@@ -273,9 +280,16 @@ UiBank の Swagger ドキュメントを開いて内容を確認してくださ�
     source .venv/bin/activate
     ```
 
-!!! warning "`Set-ExecutionPolicy` について"
-    これは PowerShell の実行ポリシーを**恒久的に変更**する操作です。企業で管理された PC では、情報システム部門の確認が必要な場合があります。
-    コマンドプロンプト（`cmd.exe`）から `.venv\Scripts\activate` を使えば、この変更は不要です。
+!!! note "PowerShell で `Activate.ps1` が実行できない場合"
+    実行ポリシーで止められています。**コマンドプロンプト（`cmd.exe`）から `.venv\Scripts\activate` を使えば、
+    設定を変えずに済みます。** こちらをおすすめします。
+
+    どうしても PowerShell で行う場合は次を実行しますが、これは PowerShell の実行ポリシーを**恒久的に変更**する
+    操作です。企業で管理された PC では、情報システム部門の確認が必要な場合があります。
+
+    ```powershell
+    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+    ```
 
 ### エージェントを公開する
 
@@ -355,12 +369,13 @@ uip codedagent init
        └─────────┘
 ```
 
-!!! tip "3 つのコマンドの違い"
+!!! tip "4 つのコマンドの違い"
     | コマンド | 役割 |
     |---|---|
     | `uip codedagent setup` | `uip` が使う Python の場所を記録する（環境側の設定） |
     | `uip codedagent init` | コードから入出力スキーマとマニフェストを生成する（**コードを変えたら実行し直す**） |
-    | `uip codedagent deploy` | パッケージ化して Orchestrator に公開する |
+    | `uip codedagent deploy` | パッケージ化して、テナントのフィードに**公開**する |
+    | `uip or processes create` | 公開したパッケージを、フォルダー内で**実行可能なプロセスとして登録**する（これが無いと Orchestrator からもフローからも実行できない） |
 
     入出力のモデルを変更したら、**必ず `init` をやり直してから** `deploy` してください。
 
@@ -381,6 +396,10 @@ Description: Loan underwriting agent that assesses UiBank loan quotes with LLM-d
 ```
 
 ### プロセスを作成する
+
+`deploy` はパッケージをテナントのフィードに**公開しただけ**です。`Package published successfully!` と出ますが、
+**この状態ではまだ実行できません。** {{ practice_folder }} フォルダーの中に「プロセス」として登録して、はじめて
+Orchestrator から、そしてレッスン3 のフローから呼び出せるようになります。
 
 まず、パッケージとそのエントリーポイントを確認します。
 
@@ -423,6 +442,12 @@ uip or packages entry-points "LoanUnderwritingAgent:0.0.1" --output json
 !!! tip "フォルダーは名前で指定できます"
     `uip or processes create` は `--folder-path` でフォルダー名を直接指定できます。GUID を調べて貼り付ける必要はありません。
     ただし**レッスン2 の `uip codedapp deploy` はキー（GUID）しか受け付けません。** そちらではキーを使います。
+
+!!! warning "コードを直して再デプロイしたときは、プロセスのバージョンも上げてください"
+    `uip codedagent deploy` で `0.0.2` を公開しても、**プロセスは作成時のバージョン（`0.0.1`）を実行し続けます。**
+    直したはずの挙動が変わらないときは、ここを疑ってください。
+
+    レッスン3 のフローが参照するのもパッケージではなく、**このプロセス**です。
 
 ### デプロイ済みエージェントを Orchestrator から実行する
 

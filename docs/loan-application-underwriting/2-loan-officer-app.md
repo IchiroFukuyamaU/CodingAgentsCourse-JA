@@ -39,12 +39,30 @@
     そのためアプリは**独立したプロジェクトとして作り、`uip codedapp deploy` で個別にデプロイ**します。
     レッスン3 のフローは、こうしてデプロイされた**公開済みアプリ**を参照します。
 
-ソリューションの**親フォルダー**に戻り、`loanofficerdashboard` という名前の空のフォルダーを作成します。
+レッスン1 の最後では `LoanApplicationUnderwriting/LoanUnderwritingAgent/` にいます。
+**ソリューションの 1 つ外側（作業ルート）**まで戻り、`loanofficerdashboard` という名前の空のフォルダーを作成します。
 
 ```bash
-cd ..                      # LoanApplicationUnderwriting の外へ
+cd ../..                   # LoanUnderwritingAgent → LoanApplicationUnderwriting → 作業ルート
 mkdir loanofficerdashboard
 ```
+
+!!! warning "`cd ..` を 1 回だけにしないでください"
+    1 回だけだと `LoanApplicationUnderwriting/`（**ソリューションの中**）に着いてしまい、アプリがソリューション内に
+    作られます。上の警告のとおり、レッスン3 で `ErrorCode 170015 No app: loanofficerdashboard found in folder:`
+    になります。
+
+    作成後は次の構成になります。
+
+    ```
+    <作業ルート>/
+    ├── LoanApplicationUnderwriting/      ← ソリューション
+    │   ├── LoanApplicationUnderwriting.uipx
+    │   └── LoanUnderwritingAgent/
+    └── loanofficerdashboard/             ← いまここを作った（ソリューションの外）
+    ```
+
+    別のターミナルを開いている場合は、`cd` せずに**作業ルートで直接** `mkdir loanofficerdashboard` でも構いません。
 
 このフォルダーをコーディングエージェント（Claude Code、Codex など）で開きます。
 
