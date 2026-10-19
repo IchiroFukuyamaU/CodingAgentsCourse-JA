@@ -111,16 +111,15 @@ LoanApplicationUnderwriting/                  ← レッスン0 で作ったソ�
 
 !!! info "なぜここで一度止まるのか"
     この後の `uip maestro flow validate` は JSON の構文とノードの型を見てくれますが、
-    **次の 3 つは見逃します。**
+    **次の 2 つは見逃します。**
 
     1. 前のレッスンのエージェントの出力が 6 つになっていない
     2. `bindings[]` の順序が違う（`Valid` が返るのに、実行すると落ちる）
-    3. Studio Web の警告のうち、**直してはいけないもの**
 
-    いずれも公開・実行してから気づくと原因の特定が難しい箇所です。ここで目視しておきます。5 分ほどです。
+    どちらも公開・実行してから気づくと原因の特定が難しい箇所です。ここで目視しておきます。5 分ほどです。
 
 `LoanUnderwritingProcess.flow` をエディタで開いてください。**確認1〜3 はこのファイルを見ながら進めます。
-この時点で Studio Web は開かないでください** — 一度開くと CLI から上書きできなくなります（理由はこのセクション末尾の警告にあります）。確認4 だけは、あとで Studio Web を開いたときのための予習です。
+この時点で Studio Web は開かないでください** — 一度開くと CLI から上書きできなくなります（理由はこのセクション末尾の警告にあります）。
 
 !!! tip "全体像の把握はコーディングエージェントに手伝ってもらえます"
     次のプロンプトを渡すと、ノードの一覧を表にしてくれます。
@@ -221,7 +220,7 @@ LoanApplicationUnderwriting/                  ← レッスン0 で作ったソ�
   "inputs": { "expression": "$vars.officerReview.status === \"Approve\"" } }
 ```
 
-2 つ目が **`$vars.officerReview.status`** を見ている点に注目してください。アプリの出力そのものではなく、人的タスクの結果（`status`）で分岐します。確認4 の警告はこの作りに由来します。
+2 つ目が **`$vars.officerReview.status`** を見ている点に注目してください。アプリの出力そのものではなく、人的タスクの結果（`status`）で分岐します。Studio Web を開いたときに出る警告（セクション末尾）は、この作りに由来します。
 
 #### ③ 人的タスクに 12 項目がマッピングされているか
 
@@ -301,39 +300,6 @@ uip solution resources add --source remote --kind App \
   --name "loanofficerdashboard" --folder-path "{{ practice_folder }}" --output json
 ```
 
-### ⚠️ 確認4: Studio Web に出る警告（先に知っておいてください）
-
-**これは今やる作業ではありません。** あとで Studio Web でフローを開いたときに、**直してはいけないものを直してしまわない**ための予習です。
-
-生成したフローを Studio Web で開くと、ヘルス アナライザーに次の警告が出ます。
-
-```
-結果「Reject」には下流のノードがありません。接続を追加するか、結果を削除してください。
-```
-
-**これは表示上のものです。実行時の正しさには影響しません。**
-
-人的タスクには `Approve` / `Reject` の 2 つの outcome を定義していますが、ノードの出力ポートは
-`completed` の 1 つだけです。どちらの判断だったかは、そのあとの**判定ノードが
-`$vars.officerReview.status` を見て分岐**します。デザイナーは outcome ごとに接続を期待するため、
-唯一のエッジを最初の outcome（Approve）に紐づけて表示し、Reject を「未接続」と見なします。
-
-!!! danger "警告を消そうとすると壊れます"
-    エッジの出力ポートを `outcome-approve` / `outcome-reject` に分けると、**`uip maestro flow validate` は
-    `Valid` を返し、この警告も消えます。** しかし**実行すると誤った経路を通ります。**
-
-    生成される BPMN を見ると、理由は明らかです。
-
-    ```xml
-    <bpmn:sequenceFlow sourceRef="officerReview" targetRef="endApproved" />   <!-- 条件なし -->
-    <bpmn:sequenceFlow sourceRef="officerReview" targetRef="endRejected" />  <!-- 条件なし -->
-    ```
-
-    条件式が付かないため、どちらを通るかが決まりません。実測では **Approve で完了しても
-    `final_decision: "Rejected"` が返りました。**
-
-    **判定ノードで分岐する構成のままにしてください。** 承認・却下の両方が正しく動くことを確認済みです。
-
 ### 条件の向きを変えたいとき
 
 マッピングや条件の調整が必要な場合は、コーディングエージェントに次のように依頼します。
@@ -372,6 +338,33 @@ uip solution resources add --source remote --kind App \
     ```
 
     そのため、**フローが一通りできてから Studio Web で確認する**のがおすすめです。
+
+!!! danger "「結果「Reject」には下流のノードがありません」が出ますが、直さないでください"
+    Studio Web でフローを開くと、ヘルス アナライザーに次の警告が出ます。
+
+    ```
+    結果「Reject」には下流のノードがありません。接続を追加するか、結果を削除してください。
+    ```
+
+    **これは表示上のものです。実行時の正しさには影響しません。** 人的タスクには `Approve` / `Reject` の
+    2 つの outcome を定義していますが、ノードの出力ポートは `completed` の 1 つだけです。どちらの判断
+    だったかは、そのあとの**判定ノードが `$vars.officerReview.status` を見て分岐**します
+    （確認2 の ② で見た 2 つ目の条件分岐です）。デザイナーは outcome ごとに接続を期待するため、
+    唯一のエッジを最初の outcome（Approve）に紐づけて表示し、Reject を「未接続」と見なします。
+
+    **消そうとすると壊れます。** エッジの出力ポートを `outcome-approve` / `outcome-reject` に分けると、
+    **`uip maestro flow validate` は `Valid` を返し、この警告も消えます。** しかし**実行すると誤った経路を
+    通ります。** 生成される BPMN を見ると理由は明らかです。
+
+    ```xml
+    <bpmn:sequenceFlow sourceRef="officerReview" targetRef="endApproved" />   <!-- 条件なし -->
+    <bpmn:sequenceFlow sourceRef="officerReview" targetRef="endRejected" />  <!-- 条件なし -->
+    ```
+
+    条件式が付かないため、どちらを通るかが決まりません。実測では **Approve で完了しても
+    `final_decision: "Rejected"` が返りました。**
+
+    **判定ノードで分岐する構成のままにしてください。** 承認・却下の両方が正しく動くことを確認済みです。
 
 ## 4. テスト用のローン見積を用意する
 
