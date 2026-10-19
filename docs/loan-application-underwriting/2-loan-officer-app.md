@@ -12,6 +12,16 @@
 
     レッスン1 で出力を 6 つにしていないと、ここで 3 つが埋まりません。
 
+!!! tip "始める前に `uip login` を実行し直してください"
+    **`uip` のセッションは約 1 時間で切れます。** このレッスンの所要時間はそれを超えるため、
+    途中で認証エラーになることがあります。始める前に入り直しておくと確実です。
+
+    ```bash
+    uip login status --output json
+    ```
+
+    `ExpirationDate` は **UTC 表記**です。日本時間に直すには 9 時間を足してください。
+
 ## 1. プロジェクトフォルダーをコーディングエージェントで開く
 
 !!! warning "このレッスンだけソリューションの外に作ります"
@@ -158,6 +168,18 @@ npm run build
 uip codedapp pack dist -n loanofficerdashboard --version 1.0.0
 uip codedapp publish -t Action
 ```
+
+!!! important "公開先を聞かれたら `N` を選んでください"
+    `uip codedapp publish -t Action` を実行すると、次のプロンプトが出ます。
+
+    ```text
+    Publish into your Personal Workspace feed instead of the tenant feed? (y/N)
+    ```
+
+    **`N` を選択してください**（そのまま Enter でも同じです）。テナントフィードに公開されます。
+
+    `y` を選ぶと個人用ワークスペースのフィードに公開され、**次の手順6 の
+    `uip codedapp deploy --folder-key` が失敗します**（演習用フォルダーに配備できません）。
 
 `-t Action` フラグは必須です。これによってアプリが Coded Action App として登録され、Maestro が人的タスクをこのアプリに振り向けられるようになります。
 

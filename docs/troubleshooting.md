@@ -25,6 +25,16 @@ uip login status --output json
 
 `Organization` と `Tenant` が演習環境のものか、`ExpirationDate` が未来かを見てください。違っていれば入り直します。
 
+!!! warning "セッションは約 1 時間で切れます"
+    各レッスンの所要時間（70〜100 分）はこれを超えるため、**レッスンの途中で必ず切れます。**
+
+    - **`ExpirationDate` は UTC 表記です。** 日本時間に直すには 9 時間を足してください
+      （例: `2026-10-19T05:30:00Z` → 日本時間 14:30）
+    - `uip login` が成功しても、**戻り値に新しい `ExpirationDate` は含まれません。**
+      確認するには `uip login status` を実行してください
+
+    **各レッスンを始める前に `uip login` を実行し直す**のが確実です。
+
 ```bash
 {{ login_command }}
 ```
@@ -181,9 +191,20 @@ uip or processes create --name "<プロセス名>" --package-key "<パッケー�
 uip tasks list --folder-path "{{ practice_folder }}" --output json
 ```
 
+### Approve / Reject のボタンが押せない（READ ONLY になっている）
+
+タスクは **Unassigned（未割り当て）** で作成されます。**開いただけでは自分に割り当てられません。**
+
+Action Center でタスクを開いたら、**画面上部の「Assign to self」をクリック**してください。
+これで編集可能になり、Approve / Reject が押せるようになります。
+
+!!! warning "レッスン4 では時間制限があります"
+    レッスン4 の RPA は Run Job のタイムアウト（30 分）内にタスクを完了させる必要があります。
+    ここで迷うと実行が失敗するため、**タスクを開いたら真っ先に「Assign to self」**を押してください。
+
 ### CLI でタスクを完了しようとすると `This action is no longer assigned to you` になる
 
-タスクは **Unassigned（未割り当て）** で作成されます。完了する前に自分に割り当ててください。
+同じ理由です。CLI から完了する場合は、先に自分に割り当てます。
 
 ```bash
 # 自分のユーザー ID を調べる
@@ -196,11 +217,43 @@ uip tasks complete <タスクID> --type AppTask --action Approve \
 ```
 
 !!! note
-    Action Center の画面から開いた場合は、開いた時点で自動的に自分に割り当てられます。この操作が必要なのは CLI から完了する場合だけです。
+    画面から操作する場合は、上記の「Assign to self」が同じ役割を果たします。
 
 ---
 
 ## RPA ワークフロー（第2部 レッスン4）
+
+### `Error code 1100` / 「フォルダーが存在しないか、このフォルダーへのアクセス権がユーザーにありません」
+
+**`uip rpa run` は `uip login` のセッションでは動きません。** PC にインストールされた
+**UiPath Assistant（Robot）の接続先テナント**で実行されます。
+
+Assistant が演習テナントと別のテナントに接続していると、Run Job と Upload Storage File が
+このエラーで失敗します。**エラーメッセージはテナントの不一致を示さないため、原因が分かりにくい**のが厄介です。
+
+**確認する**
+
+1. タスクトレイの **UiPath Assistant** を開きます
+2. **設定（歯車）→ Orchestrator 設定**で、接続先の組織・テナントを確認します
+3. 演習テナントと違っていれば、接続し直します
+
+ログからも確認できます。
+
+=== "Windows (PowerShell)"
+    ```powershell
+    Get-Content "$env:LOCALAPPDATA\UiPath\Logs\internal\Robot.log" -Tail 50
+    ```
+
+!!! note "`uip rpa run` にテナントを指定するオプションはありません"
+    `uip rpa run --help` にフォルダーやテナントを指定するフラグはなく、**Assistant の接続先がすべて**です。
+    `uip login` でどのテナントにログインしていても、ローカル実行の接続先は変わりません。
+
+**ローカル実行を飛ばす選択肢もあります**
+
+Assistant の接続先を変えられない場合は、**ローカル実行（手順5）を省いて、手順6（Orchestrator への公開）
+→ 手順7（Orchestrator からの実行）に進んでください。** Orchestrator から実行すれば `uip login` と同じ
+テナントで動きます。レッスンの目的は達成できます。
+
 
 ### Run Job がタイムアウトする
 

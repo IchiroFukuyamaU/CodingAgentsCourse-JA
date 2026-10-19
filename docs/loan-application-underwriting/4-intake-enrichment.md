@@ -17,13 +17,36 @@
       → ストレージバケットにアップロード
     ```
 
-## 1. プロジェクトフォルダーをコーディングエージェントで開く
+!!! tip "始める前に `uip login` を実行し直してください"
+    **`uip` のセッションは約 1 時間で切れます。** このレッスンの所要時間はそれを超えるため、
+    途中で認証エラーになることがあります。始める前に入り直しておくと確実です。
 
-`LoanApplicationDispatcher` という名前の空のフォルダーを作成し、コーディングエージェント（Claude Code、Codex など）で開きます。
+    ```bash
+    uip login status --output json
+    ```
+
+    `ExpirationDate` は **UTC 表記**です。日本時間に直すには 9 時間を足してください。
+
+## 1. ソリューションの中にプロジェクトを作る
+
+[レッスン0](0-environment-setup.md) で作ったソリューションの中で作業します。
 
 ```bash
-mkdir LoanApplicationDispatcher
+cd LoanApplicationUnderwriting
 ```
+
+ここをコーディングエージェント（Claude Code、Codex など）で開きます。プロジェクトの作成は
+コーディングエージェントが `uip rpa init` で行います。
+
+!!! note "`uip rpa init` はプロジェクト名を `--name` で渡します"
+    他の `init` 系コマンドと違い、位置引数ではありません。
+
+    ```bash
+    uip rpa init --name LoanApplicationDispatcher --target-framework Portable --expression-language VisualBasic
+    ```
+
+    コーディングエージェントに任せる場合も、この形になっているか確認してください。
+
 
 ## 2. 自動化の内容を説明する
 
@@ -174,6 +197,16 @@ cd LoanApplicationDispatcher
     RPA プロジェクトには `bindings_v2.json` が無いため、`uip solution resources refresh` では同期されません
     （`Synced 0 resources` になります）。**明示的に追加してください。**
 
+### プロジェクトをソリューションに登録する
+
+```bash
+cd ..                                                   # ソリューションのルートへ
+uip solution projects add "LoanApplicationDispatcher" --output json
+cd LoanApplicationDispatcher
+```
+
+`LoanApplicationUnderwriting.uipx` の `Projects` に `Type: "Process"` として登録されます。
+
 ### 検証する
 
 ```bash
@@ -225,7 +258,31 @@ loan_amount、loan_term、yearly_income、age は変更せずそのまま残し�
 !!! danger "実行したら、すぐに Action Center を開いてください"
     このワークフローは、起動した Maestro フローの**完了を待ちます**。中・高リスクの申込では Action Center の人的タスクで停止するため、**承認するまでワークフローは先に進みません。**
 
-    **実行ボタンを押したら、ブラウザーで Action Center を開いて待機してください。** タスクが現れたらすぐに承認または却下します。放置するとタイムアウトします。
+    **実行ボタンを押したら、ブラウザーで Action Center を開いて待機してください。** タスクが現れたら、
+    **上部の「Assign to self」をクリックしてから**承認または却下します。放置するとタイムアウトします。
+
+    !!! note "「Assign to self」を押さないとボタンが押せません"
+        タスクは未割り当ての状態で作成されるため、開いただけでは READ ONLY です。
+        タイムアウトは 30 分なので、ここで迷わないよう先に覚えておいてください。
+
+!!! warning "ローカル実行は Assistant の接続先で動きます"
+    **`uip rpa run` は `uip login` のセッションでは動きません。** PC にインストールされた
+    **UiPath Assistant（Robot）の接続先テナント**で実行されます。
+
+    接続先が演習テナントと違っていると、**Run Job と Upload Storage File が次のエラーで失敗します。**
+
+    ```text
+    Error code 1100
+    フォルダーが存在しないか、このフォルダーへのアクセス権がユーザーにありません
+    ```
+
+    エラーメッセージはテナントの不一致を示さないため、原因に気づきにくい箇所です。
+
+    **実行前に確認してください。** タスクトレイの **UiPath Assistant** → **設定 → Orchestrator 設定**で、
+    接続先の組織・テナントが演習環境と一致しているか見てください。
+
+    接続先を変えられない場合は、**ローカル実行（この手順5）を飛ばして、手順6 → 手順7 に進んでください。**
+    Orchestrator から実行すれば `uip login` と同じテナントで動き、レッスンの目的は達成できます。
 
 ### 実行する
 
@@ -347,7 +404,8 @@ uip or processes create --folder-path "{{ practice_folder }}" \
 **Orchestrator** で **{{ practice_folder }}** フォルダーを開き、`LoanApplicationDispatcher` を選択して、手動で実行を開始します。
 
 !!! danger "ここでも、実行したらすぐ Action Center を開いてください"
-    Orchestrator から実行しても挙動は同じです。中・高リスクの申込で人的タスクが発生したら、その場で完了させてください。
+    Orchestrator から実行しても挙動は同じです。中・高リスクの申込で人的タスクが発生したら、
+    **「Assign to self」をクリックしてから**その場で完了させてください。
 
 `loan-applications.csv` の各申込が送信され、受理されたものについて Maestro フローが開始され、結果が返ってくる様子を確認してください。実行が完了したら `results.csv` を開き、すべての行の最終ステータスが `Loan Approved` または `Loan Rejected` になっていることを確認します。
 
