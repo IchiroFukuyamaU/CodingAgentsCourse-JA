@@ -109,9 +109,63 @@ LoanApplicationUnderwriting/                  ← レッスン0 で作ったソ�
 
 ## 3. 生成されたフローをレビューする
 
-`LoanUnderwritingProcess.flow` をテキストエディタで開くか、コーディングエージェントに構造を説明させてください。
+!!! info "なぜここで一度止まるのか"
+    この後の `uip maestro flow validate` は JSON の構文とノードの型を見てくれますが、
+    **次の 3 つは見逃します。**
 
-### ノードとエッジ
+    1. 前のレッスンのエージェントの出力が 6 つになっていない
+    2. `bindings[]` の順序が違う（`Valid` が返るのに、実行すると落ちる）
+    3. Studio Web の警告のうち、**直してはいけないもの**
+
+    いずれも公開・実行してから気づくと原因の特定が難しい箇所です。ここで目視しておきます。5 分ほどです。
+
+`LoanUnderwritingProcess.flow` をエディタで開いてください。以下の確認1〜4 は、このファイルを見ながら進めます。
+
+!!! tip "全体像の把握はコーディングエージェントに手伝ってもらえます"
+    次のプロンプトを渡すと、ノードの一覧を表にしてくれます。
+
+    ```text
+    LoanUnderwritingProcess.flow を読んで、ノードとエッジの一覧を表にしてください。
+    各ノードの種類（開始・エージェント・条件分岐・ヒューマンタスク・終了）と、
+    条件分岐がどの変数を見ているかを示してください。
+    ```
+
+    ただし **確認3（`bindings[]` の順序）は、聞いても指摘してくれません。** 順序が実行結果を変える
+    という仕様をエージェントは知らないためです。そこだけは自分の目で見てください。
+
+### 確認1: エージェントの出力が 6 つあるか
+
+ファイル内を **`"risk_band":`** で検索してください。**1 箇所だけ**ヒットします。そこがエージェントノードの
+出力定義（`definitions[].outputDefinition.output.schema`）です。
+
+```json
+"schema": {
+  "type": "object",
+  "properties": {
+    "credit_score":         { "type": "integer", "title": "Credit Score" },
+    "risk_band":            { "type": "string",  "title": "Risk Band", "enum": ["Low","Medium","High"] },
+    "assessment_summary":   { "type": "string",  "title": "Assessment Summary" },
+    "monthly_repayment":    { "type": "number",  "title": "Monthly Repayment" },
+    "debt_to_income_ratio": { "type": "number",  "title": "Debt To Income Ratio" },
+    "loan_to_market_ratio": { "type": "number",  "title": "Loan To Market Ratio" }
+  }
+}
+```
+
+**`properties` の中が 6 項目になっていますか。**
+
+- **6 項目ある** → 確認2 に進んでください
+- **3 項目しかない** → レッスン1 のエージェントが 3 出力のままです。レッスン1 に戻って修正し、
+  `uip codedagent deploy` → `uip maestro flow registry pull --force` をやり直してください。
+  **ここで直さないと、手順6 でヒューマンタスクの項目がほとんど空になります。**
+
+!!! note "`outputDefinition` で検索しないでください"
+    `outputDefinition` はノードの種類ごとに 1 つずつあり、**ファイル内に 4 箇所**出てきます。
+    どれがエージェントのものか分かりにくいため、`"risk_band":` で検索してください。
+
+### 確認2: フローの構成が設計どおりか
+
+コーディングエージェントの生成結果は実行のたびに少しずつ変わります。次の 6 つがそろっているか見てください。
 
 - 6 つのプロセス入力変数（`loan_id`、`applicant_first_name`、`applicant_last_name`、`loan_amount`、`loan_term`、`income`）を持つ **Start ノード**
 - `loan_id` を入力として `LoanUnderwritingAgent` を呼び出し、**6 つの出力変数**を受け取る **Agent ノード**
@@ -120,12 +174,9 @@ LoanApplicationUnderwriting/                  ← レッスン0 で作ったソ�
 - `officer_decision == "Approve"` で分岐する 2 つ目の **Condition ノード**
 - 3 つの **End ノード**（Auto-Approved、Approved、Rejected）
 
-!!! important "エージェントの出力が 6 つあるか"
-    Agent ノードの定義（`definitions[]`）にある `outputDefinition.output.schema` を確認してください。**ここに 6 項目すべてが並んでいなければ、フローから参照できません。**
+足りないものがあれば、コーディングエージェントに不足分を伝えて直してもらってください。
 
-    3 項目しか無い場合は、レッスン1 のエージェントが 3 出力のままです。レッスン1 に戻って修正し、`uip codedagent deploy` → `uip maestro flow registry pull --force` をやり直してください。
-
-### ⚠️ `bindings[]` の順序を必ず確認する
+### ⚠️ 確認3: `bindings[]` の順序を必ず確認する
 
 **このレッスンで最も見つけにくい不具合です。** `.flow` の `bindings[]` 配列を開き、**アプリ用のバインディングがエージェント用より前にある**ことを確認してください。
 
@@ -178,7 +229,7 @@ uip solution resources add --source remote --kind App \
   --name "loanofficerdashboard" --folder-path "{{ practice_folder }}" --output json
 ```
 
-### ⚠️ Studio Web で出る警告について（消そうとしないでください）
+### ⚠️ 確認4: Studio Web で出る警告について（消そうとしないでください）
 
 生成したフローを Studio Web で開くと、ヘルス アナライザーに次の警告が出ます。
 
