@@ -119,7 +119,8 @@ LoanApplicationUnderwriting/                  ← レッスン0 で作ったソ�
 
     いずれも公開・実行してから気づくと原因の特定が難しい箇所です。ここで目視しておきます。5 分ほどです。
 
-`LoanUnderwritingProcess.flow` をエディタで開いてください。以下の確認1〜4 は、このファイルを見ながら進めます。
+`LoanUnderwritingProcess.flow` をエディタで開いてください。**確認1〜3 はこのファイルを見ながら進めます。
+この時点で Studio Web は開かないでください** — 一度開くと CLI から上書きできなくなります（理由はこのセクション末尾の警告にあります）。確認4 だけは、あとで Studio Web を開いたときのための予習です。
 
 !!! tip "全体像の把握はコーディングエージェントに手伝ってもらえます"
     次のプロンプトを渡すと、ノードの一覧を表にしてくれます。
@@ -129,6 +130,8 @@ LoanApplicationUnderwriting/                  ← レッスン0 で作ったソ�
     各ノードの種類（開始・エージェント・条件分岐・ヒューマンタスク・終了）と、
     条件分岐がどの変数を見ているかを示してください。
     ```
+
+    確認2 はこの表があると早く済みます。
 
     ただし **確認3（`bindings[]` の順序）は、聞いても指摘してくれません。** 順序が実行結果を変える
     という仕様をエージェントは知らないためです。そこだけは自分の目で見てください。
@@ -165,14 +168,83 @@ LoanApplicationUnderwriting/                  ← レッスン0 で作ったソ�
 
 ### 確認2: フローの構成が設計どおりか
 
-コーディングエージェントの生成結果は実行のたびに少しずつ変わります。次の 6 つがそろっているか見てください。
+コーディングエージェントの生成結果は実行のたびに少しずつ変わります。設計どおりのノードがそろっているか見ます。
 
-- 6 つのプロセス入力変数（`loan_id`、`applicant_first_name`、`applicant_last_name`、`loan_amount`、`loan_term`、`income`）を持つ **Start ノード**
-- `loan_id` を入力として `LoanUnderwritingAgent` を呼び出し、**6 つの出力変数**を受け取る **Agent ノード**
-- `risk_band == "Low"` で分岐する **Condition ノード**
-- `loanofficerdashboard` に接続され、**12 個の変数**がすべて入力としてマッピングされ、`officer_decision` を出力とする **Human Task ノード**
-- `officer_decision == "Approve"` で分岐する 2 つ目の **Condition ノード**
-- 3 つの **End ノード**（Auto-Approved、Approved、Rejected）
+**ファイル冒頭の `"nodes": [` から `"edges": [` の手前まで**が、ノードの一覧です。まず **ノードが 8 つ**あり、`id` と `type` が次のようになっているか確認してください。
+
+```json
+"nodes": [
+  { "id": "start",                "type": "core.trigger.manual" },
+  { "id": "underwritingAgent",    "type": "uipath.core.agent.<エージェントのキー>" },
+  { "id": "checkRiskBand",        "type": "core.logic.decision" },
+  { "id": "officerReview",        "type": "uipath.human-in-the-loop.coded-action-app" },
+  { "id": "checkOfficerDecision", "type": "core.logic.decision" },
+  { "id": "endAutoApproved",      "type": "core.control.end" },
+  { "id": "endApproved",          "type": "core.control.end" },
+  { "id": "endRejected",          "type": "core.control.end" }
+]
+```
+
+!!! note "`id` の名前は違っていてかまいません"
+    `underwritingAgent` が `loanAgent` になっていても問題ありません。**`type` の種類と個数**が合っているかを見てください。実際のファイルでは各ノードに `display` や `inputs` も付くので、上の例より行数は多くなります。
+
+続いて、ノードの中身を 3 点だけ確認します。
+
+#### ① 入力変数が 6 つあるか
+
+**`"globals":`** で検索してください。1 箇所だけヒットします。
+
+```json
+"globals": [
+  { "id": "loan_id",              "direction": "in", "type": "string", "triggerNodeId": "start" },
+  { "id": "applicant_first_name", "direction": "in", "type": "string", "triggerNodeId": "start" },
+  { "id": "applicant_last_name",  "direction": "in", "type": "string", "triggerNodeId": "start" },
+  { "id": "loan_amount",          "direction": "in", "type": "number", "triggerNodeId": "start" },
+  { "id": "loan_term",            "direction": "in", "type": "number", "triggerNodeId": "start" },
+  { "id": "income",               "direction": "in", "type": "number", "triggerNodeId": "start" }
+]
+```
+
+`"direction": "in"` の項目が **6 つ**あるか見てください。これが手順6 で実行時に入力する値になります。
+
+#### ② 2 つの条件分岐が正しい変数を見ているか
+
+`core.logic.decision` のノードが 2 つあります。それぞれの `inputs.expression` を見てください。
+
+```json
+{ "id": "checkRiskBand",
+  "type": "core.logic.decision",
+  "inputs": { "expression": "$vars.underwritingAgent.output.risk_band === \"Low\"" } }
+
+{ "id": "checkOfficerDecision",
+  "type": "core.logic.decision",
+  "inputs": { "expression": "$vars.officerReview.status === \"Approve\"" } }
+```
+
+2 つ目が **`$vars.officerReview.status`** を見ている点に注目してください。アプリの出力そのものではなく、人的タスクの結果（`status`）で分岐します。確認4 の警告はこの作りに由来します。
+
+#### ③ 人的タスクに 12 項目がマッピングされているか
+
+**`"appInputBindings":`** で検索してください。1 箇所だけヒットします。
+
+```json
+"appInputBindings": {
+  "LoanId":             "=vars.start.output.loan_id",
+  "ApplicantFirstName": "=vars.start.output.applicant_first_name",
+  "ApplicantLastName":  "=vars.start.output.applicant_last_name",
+  "LoanAmount":         "=vars.start.output.loan_amount",
+  "LoanTerm":           "=vars.start.output.loan_term",
+  "YearlyIncome":       "=vars.start.output.income",
+  "CreditScore":        "=vars.underwritingAgent.output.credit_score",
+  "RiskBand":           "=vars.underwritingAgent.output.risk_band",
+  "AssessmentSummary":  "=vars.underwritingAgent.output.assessment_summary",
+  "MonthlyRepayment":   "=vars.underwritingAgent.output.monthly_repayment",
+  "DebtToIncomeRatio":  "=vars.underwritingAgent.output.debt_to_income_ratio",
+  "LoanToMarketRatio":  "=vars.underwritingAgent.output.loan_to_market_ratio"
+}
+```
+
+**12 行あり、右辺がすべて `=vars....` で埋まっていますか。** 前半 6 項目が Start ノードから、後半 6 項目が確認1 で見たエージェントの出力から来ています。右辺が `""` だったり項目が欠けていたりすると、**手順6 で担当者の画面のその欄が空になります。**
 
 足りないものがあれば、コーディングエージェントに不足分を伝えて直してもらってください。
 
@@ -229,7 +301,9 @@ uip solution resources add --source remote --kind App \
   --name "loanofficerdashboard" --folder-path "{{ practice_folder }}" --output json
 ```
 
-### ⚠️ 確認4: Studio Web で出る警告について（消そうとしないでください）
+### ⚠️ 確認4: Studio Web に出る警告（先に知っておいてください）
+
+**これは今やる作業ではありません。** あとで Studio Web でフローを開いたときに、**直してはいけないものを直してしまわない**ための予習です。
 
 生成したフローを Studio Web で開くと、ヘルス アナライザーに次の警告が出ます。
 
