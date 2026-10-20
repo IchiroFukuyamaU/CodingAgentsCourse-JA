@@ -1,0 +1,1857 @@
+
+<!doctype html>
+<html lang="ja" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="コーディングエージェントを使って UiPath のエージェントと Maestro オーケストレーションを構築する、自習用ハンズオン教材">
+      
+      
+      
+        <link rel="canonical" href="https://ichirofukuyamau.github.io/CodingAgentsCourse-JA/loan-application-underwriting/3-maestro-flow/">
+      
+      
+        <link rel="prev" href="../2-loan-officer-app/">
+      
+      
+        <link rel="next" href="../4-intake-enrichment/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>3. Maestro Flow によるオーケストレーション - UiPath コーディングエージェント 自習コース</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-orange" data-md-color-accent="orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#3-maestro-flow-によるオーケストレーション" class="md-skip">
+          コンテンツにスキップ
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="ヘッダー">
+    <a href="../.." title="UiPath コーディングエージェント 自習コース" class="md-header__button md-logo" aria-label="UiPath コーディングエージェント 自習コース" data-md-component="logo">
+      
+  <img src="../../assets/images/Partner Success Logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            UiPath コーディングエージェント 自習コース
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              3. Maestro Flow によるオーケストレーション
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="検索" placeholder="検索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="検索">
+        
+        <button type="reset" class="md-search__icon md-icon" title="クリア" aria-label="クリア" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            検索を初期化
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="タブ" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  ホーム
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../getting-started/" class="md-tabs__link">
+          
+  
+  
+  第1部 コーディングエージェント入門
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+  第2部 ローン審査の自動化
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../troubleshooting/" class="md-tabs__link">
+          
+  
+  
+  困ったときは
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../next-steps/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  次のステップ
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="ナビゲーション" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="UiPath コーディングエージェント 自習コース" class="md-nav__button md-logo" aria-label="UiPath コーディングエージェント 自習コース" data-md-component="logo">
+      
+  <img src="../../assets/images/Partner Success Logo.png" alt="logo">
+
+    </a>
+    UiPath コーディングエージェント 自習コース
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ホーム
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第1部 コーディングエージェント入門
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    第1部 コーディングエージェント入門
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    概要
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/0-prerequisites/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0. 前提ソフトウェアを準備する
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/1-install-the-cli-and-skills/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1. CLI とスキルをインストールする
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/2-practice-the-cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2. CLI を使ってみる
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/3-build-your-first-agent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3. 初めてのエージェントを作る
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/you-did-it/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第1部の完了
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第2部 ローン審査の自動化
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    第2部 ローン審査の自動化
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    概要
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agenda/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    学習の進め方
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../what-is-a-coding-agent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    コーディングエージェントとは？
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../0-environment-setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    0. 演習環境を準備する
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../1-underwriting-agent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1. AI による与信審査
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2-loan-officer-app/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2. ローン担当者レビュー用ダッシュボード
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3. Maestro Flow によるオーケストレーション
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3. Maestro Flow によるオーケストレーション
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目次">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目次
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-ソリューションの中で作業を始める" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. ソリューションの中で作業を始める
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-プロセスの内容を説明する" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. プロセスの内容を説明する
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-生成されたフローをレビューする" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 生成されたフローをレビューする
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. 生成されたフローをレビューする">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#確認1-エージェントの出力が-6-つあるか" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        確認1: エージェントの出力が 6 つあるか
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#確認2-フローの構成が設計どおりか" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        確認2: フローの構成が設計どおりか
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="確認2: フローの構成が設計どおりか">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#①-入力変数が-6-つあるか" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ① 入力変数が 6 つあるか
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#②-2-つの条件分岐が正しい変数を見ているか" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ② 2 つの条件分岐が正しい変数を見ているか
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#③-人的タスクに-12-項目がマッピングされているか" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ③ 人的タスクに 12 項目がマッピングされているか
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#-確認3-bindings-の順序を必ず確認する" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚠️ 確認3: bindings[] の順序を必ず確認する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#条件の向きを変えたいとき" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        条件の向きを変えたいとき
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-テスト用のローン見積を用意する" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. テスト用のローン見積を用意する
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-検証して公開する" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. 検証して公開する
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-フロー全体をテストする" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. フロー全体をテストする
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. フロー全体をテストする">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#うまくいかないとき" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        うまくいかないとき
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#このレッスンでできたこと" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        このレッスンでできたこと
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../4-intake-enrichment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    4. 申込受付とデータ補完
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../you-did-it/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    第2部の完了
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    困ったときは
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    困ったときは
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    トラブルシューティング
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cleanup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    演習環境の片付け
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../next-steps/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    次のステップ
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="3-maestro-flow-によるオーケストレーション">3. Maestro Flow によるオーケストレーション<a class="headerlink" href="#3-maestro-flow-によるオーケストレーション" title="Permanent link">&para;</a></h1>
+<p><code>uipath-maestro-flow</code> スキルを使って、コーデッドエージェントとローン担当者用ダッシュボードをつなぎ、リスクバンドに応じて申込を振り分ける UiPath Flow プロセスを生成します。</p>
+<div class="admonition info">
+<p class="admonition-title">このレッスンで作るもの</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>開始 → エージェント呼び出し → risk_band == "Low" ?
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>                                ├─ Yes → 自動承認して終了
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>                                └─ No  → 人的レビュー（アプリを表示）
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>                                          → officer_decision == "Approve" ?
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>                                              ├─ Yes → 承認して終了
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>                                              └─ No  → 却下して終了
+</code></pre></div>
+どの経路を通っても <code>final_decision</code>（<code>Approved</code> / <code>Rejected</code>）を返します。</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">前提の確認</p>
+<p>このレッスンは、レッスン1 と レッスン2 の成果物を参照します。先に次を確認してください。</p>
+<ul>
+<li>レッスン1 のエージェントが <strong>6 項目</strong>を返すこと</li>
+<li>レッスン2 のアプリが <strong>CodingAgentsWorkshop</strong> フォルダーにデプロイ済みであること</li>
+</ul>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">始める前に <code>uip login</code> を実行し直してください</p>
+<p><strong><code>uip</code> のセッションは約 1 時間で切れます。</strong> このレッスンの所要時間はそれを超えるため、
+途中で認証エラーになることがあります。始める前に入り直しておくと確実です。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>uip<span class="w"> </span>login<span class="w"> </span>status<span class="w"> </span>--output<span class="w"> </span>json
+</code></pre></div>
+<p><code>ExpirationDate</code> は <strong>UTC 表記</strong>です。日本時間に直すには 9 時間を足してください。</p>
+</div>
+<h2 id="1-ソリューションの中で作業を始める">1. ソリューションの中で作業を始める<a class="headerlink" href="#1-ソリューションの中で作業を始める" title="Permanent link">&para;</a></h2>
+<p><a href="../0-environment-setup/">レッスン0</a> で作ったソリューションに移動します。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">cd</span><span class="w"> </span>LoanApplicationUnderwriting
+</code></pre></div>
+<p>ここをコーディングエージェント（Claude Code、Codex など）で開きます。<strong>フロープロジェクトはコーディングエージェントが
+<code>uip maestro flow init</code> で作成し、ソリューションへの登録まで自動で行います。</strong></p>
+<div class="admonition note">
+<p class="admonition-title">自分でフォルダーを作らないでください</p>
+<p>Flow プロジェクトは <code>&lt;ソリューション&gt;/&lt;プロジェクト&gt;/&lt;プロジェクト&gt;.flow</code> という構成が必要で、
+<code>uip maestro flow init</code> がこれを正しく作ります。先に <code>mkdir</code> すると、初期化がその場所を避けてしまいます。</p>
+</div>
+<h2 id="2-プロセスの内容を説明する">2. プロセスの内容を説明する<a class="headerlink" href="#2-プロセスの内容を説明する" title="Permanent link">&para;</a></h2>
+<p>フロー全体を、コーディングエージェントに平易な言葉で説明します。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>uipath-maestro-flow スキルを使って、LoanUnderwritingProcess という名前の
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>UiPath Flow プロセスを構築してください。要件は次のとおりです:
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>1. 6 つの入力を受け取る: loan_id、applicant_first_name、applicant_last_name、
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>   loan_amount、loan_term、income
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>2. エージェント LoanUnderwritingAgent（CodingAgentsWorkshop フォルダー内）を
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>   呼び出し、loan_id を渡して、返された値をプロセス変数として保持する:
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>   credit_score、risk_band、assessment_summary、monthly_repayment、
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>   debt_to_income_ratio、loan_to_market_ratio
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>3. risk_band が "Low" の場合は申込を自動承認してプロセスを終了する
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>4. Medium または High の場合は、アプリ loanofficerdashboard
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>   （CodingAgentsWorkshop フォルダー内）を人的タスクとして開き、12 個の入力すべて
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>   （LoanId、ApplicantFirstName、ApplicantLastName、LoanAmount、LoanTerm、YearlyIncome、
+<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>   CreditScore、RiskBand、AssessmentSummary、MonthlyRepayment、
+<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>   DebtToIncomeRatio、LoanToMarketRatio）を渡し、officer_decision を受け取る
+<a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>5. officer_decision に基づいて Approved または Rejected で終了する
+<a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a>6. 自動承認された場合もローン担当者が判断した場合も、いずれのケースでも
+<a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a>   final_decision（string — "Approved" または "Rejected"）を出力する
+<a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a>
+<a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a>7. 人的タスクのノードがアプリを正しく解決できるよう、次の 2 点を必ず行ってください:
+<a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a>   - uip solution resources add --source remote --kind App でアプリをソリューションリソースに登録する
+<a id="__codelineno-3-22" name="__codelineno-3-22" href="#__codelineno-3-22"></a>   - .flow の bindings[] にアプリ用のバインディング対（name / folderPath）を追加し、
+<a id="__codelineno-3-23" name="__codelineno-3-23" href="#__codelineno-3-23"></a>     それをエージェント用のバインディングより前に置く
+</code></pre></div>
+<div class="admonition important">
+<p class="admonition-title">要件7 を省略しないでください</p>
+<p>要件7 は原典にはありませんが、<strong>これを省くと <code>validate</code> は通るのに実行時に失敗します。</strong> 理由は<a href="#3-生成されたフローをレビューする">手順3</a>で説明します。</p>
+</div>
+<p>コーディングエージェントは <code>uipath-maestro-flow</code> スキルのコンテキストを読み取り、完全なプロジェクトを生成します。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>LoanApplicationUnderwriting/                  ← レッスン0 で作ったソリューション
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>├── LoanApplicationUnderwriting.uipx
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>├── LoanUnderwritingAgent/                    ← レッスン1 で追加済み
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>├── resources/solution_folder/
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>│   └── app/CodedAction/loanofficerdashboard.json
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>└── LoanUnderwritingProcess/                  ← 今回追加（フロープロジェクト）
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>    ├── LoanUnderwritingProcess.flow
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>    ├── operate.json
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>    └── project.uiproj
+</code></pre></div>
+<p><code>uip maestro flow init</code> の出力に <code>"SolutionRegistration": { "Status": "Registered" }</code> とあれば、
+ソリューションへの登録まで完了しています。</p>
+<div class="admonition tip">
+<p class="admonition-title">エージェントはソリューション内の兄弟として参照することもできます</p>
+<p>レッスン1 のエージェントは同じソリューションの中にあるため、フローから<strong>ローカル参照</strong>できます。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>uip<span class="w"> </span>maestro<span class="w"> </span>flow<span class="w"> </span>registry<span class="w"> </span>list<span class="w"> </span>--local<span class="w"> </span>--output<span class="w"> </span>json
+</code></pre></div>
+<p><code>(In-solution) LoanUnderwritingAgent</code> が表示されるはずです。この形で参照すると、<strong>エージェントを先に
+デプロイしなくてもフローを作れます。</strong></p>
+<p>ただし本コースでは、レッスン1 でデプロイ済みの<strong>公開エージェント</strong>を参照する形で進めます。
+そのほうが各レッスンで動作を確認しながら進められるためです。</p>
+</div>
+<h2 id="3-生成されたフローをレビューする">3. 生成されたフローをレビューする<a class="headerlink" href="#3-生成されたフローをレビューする" title="Permanent link">&para;</a></h2>
+<div class="admonition info">
+<p class="admonition-title">なぜここで一度止まるのか</p>
+<p>この後の <code>uip maestro flow validate</code> は JSON の構文とノードの型を見てくれますが、
+<strong>次の 2 つは見逃します。</strong></p>
+<ol>
+<li>前のレッスンのエージェントの出力が 6 つになっていない</li>
+<li><code>bindings[]</code> の順序が違う（<code>Valid</code> が返るのに、実行すると落ちる）</li>
+</ol>
+<p>どちらも公開・実行してから気づくと原因の特定が難しい箇所です。ここで目視しておきます。5 分ほどです。</p>
+</div>
+<p><code>LoanUnderwritingProcess.flow</code> をエディタで開いてください。<strong>確認1〜3 はこのファイルを見ながら進めます。
+この時点で Studio Web は開かないでください</strong> — 一度開くと CLI から上書きできなくなります（理由はこのセクション末尾の警告にあります）。</p>
+<div class="admonition tip">
+<p class="admonition-title">全体像の把握はコーディングエージェントに手伝ってもらえます</p>
+<p>次のプロンプトを渡すと、ノードの一覧を表にしてくれます。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>LoanUnderwritingProcess.flow を読んで、ノードとエッジの一覧を表にしてください。
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>各ノードの種類（開始・エージェント・条件分岐・ヒューマンタスク・終了）と、
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>条件分岐がどの変数を見ているかを示してください。
+</code></pre></div>
+<p>確認2 はこの表があると早く済みます。</p>
+<p>ただし <strong>確認3（<code>bindings[]</code> の順序）は、聞いても指摘してくれません。</strong> 順序が実行結果を変える
+という仕様をエージェントは知らないためです。そこだけは自分の目で見てください。</p>
+</div>
+<h3 id="確認1-エージェントの出力が-6-つあるか">確認1: エージェントの出力が 6 つあるか<a class="headerlink" href="#確認1-エージェントの出力が-6-つあるか" title="Permanent link">&para;</a></h3>
+<p>ファイル内を <strong><code>"risk_band":</code></strong> で検索してください。<strong>1 箇所だけ</strong>ヒットします。そこがエージェントノードの
+出力定義（<code>definitions[].outputDefinition.output.schema</code>）です。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nt">"schema"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"object"</span><span class="p">,</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="nt">"properties"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">    </span><span class="nt">"credit_score"</span><span class="p">:</span><span class="w">         </span><span class="p">{</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"integer"</span><span class="p">,</span><span class="w"> </span><span class="nt">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Credit Score"</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">    </span><span class="nt">"risk_band"</span><span class="p">:</span><span class="w">            </span><span class="p">{</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span><span class="w">  </span><span class="nt">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Risk Band"</span><span class="p">,</span><span class="w"> </span><span class="nt">"enum"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"Low"</span><span class="p">,</span><span class="s2">"Medium"</span><span class="p">,</span><span class="s2">"High"</span><span class="p">]</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span><span class="nt">"assessment_summary"</span><span class="p">:</span><span class="w">   </span><span class="p">{</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span><span class="w">  </span><span class="nt">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Assessment Summary"</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">    </span><span class="nt">"monthly_repayment"</span><span class="p">:</span><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"number"</span><span class="p">,</span><span class="w">  </span><span class="nt">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Monthly Repayment"</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">    </span><span class="nt">"debt_to_income_ratio"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"number"</span><span class="p">,</span><span class="w">  </span><span class="nt">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Debt To Income Ratio"</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="w">    </span><span class="nt">"loan_to_market_ratio"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"number"</span><span class="p">,</span><span class="w">  </span><span class="nt">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Loan To Market Ratio"</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong><code>properties</code> の中が 6 項目になっていますか。</strong></p>
+<ul>
+<li><strong>6 項目ある</strong> → 確認2 に進んでください</li>
+<li><strong>3 項目しかない</strong> → レッスン1 のエージェントが 3 出力のままです。レッスン1 に戻って修正し、
+  <code>uip codedagent deploy</code> → <code>uip maestro flow registry pull --force</code> をやり直してください。
+  <strong>ここで直さないと、手順6 でヒューマンタスクの項目がほとんど空になります。</strong></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title"><code>outputDefinition</code> で検索しないでください</p>
+<p><code>outputDefinition</code> はノードの種類ごとに 1 つずつあり、<strong>ファイル内に 4 箇所</strong>出てきます。
+どれがエージェントのものか分かりにくいため、<code>"risk_band":</code> で検索してください。</p>
+</div>
+<h3 id="確認2-フローの構成が設計どおりか">確認2: フローの構成が設計どおりか<a class="headerlink" href="#確認2-フローの構成が設計どおりか" title="Permanent link">&para;</a></h3>
+<p>コーディングエージェントの生成結果は実行のたびに少しずつ変わります。設計どおりのノードがそろっているか見ます。</p>
+<p><strong>ファイル冒頭の <code>"nodes": [</code> から <code>"edges": [</code> の手前まで</strong>が、ノードの一覧です。まず <strong>ノードが 8 つ</strong>あり、<code>id</code> と <code>type</code> が次のようになっているか確認してください。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nt">"nodes"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"start"</span><span class="p">,</span><span class="w">                </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"core.trigger.manual"</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"underwritingAgent"</span><span class="p">,</span><span class="w">    </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"uipath.core.agent.&lt;エージェントのキー&gt;"</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"checkRiskBand"</span><span class="p">,</span><span class="w">        </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"core.logic.decision"</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"officerReview"</span><span class="p">,</span><span class="w">        </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"uipath.human-in-the-loop.coded-action-app"</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"checkOfficerDecision"</span><span class="p">,</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"core.logic.decision"</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"endAutoApproved"</span><span class="p">,</span><span class="w">      </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"core.control.end"</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"endApproved"</span><span class="p">,</span><span class="w">          </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"core.control.end"</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"endRejected"</span><span class="p">,</span><span class="w">          </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"core.control.end"</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="p">]</span>
+</code></pre></div>
+<div class="admonition note">
+<p class="admonition-title"><code>id</code> の名前は違っていてかまいません</p>
+<p><code>underwritingAgent</code> が <code>loanAgent</code> になっていても問題ありません。<strong><code>type</code> の種類と個数</strong>が合っているかを見てください。実際のファイルでは各ノードに <code>display</code> や <code>inputs</code> も付くので、上の例より行数は多くなります。</p>
+</div>
+<p>続いて、ノードの中身を 3 点だけ確認します。</p>
+<h4 id="①-入力変数が-6-つあるか">① 入力変数が 6 つあるか<a class="headerlink" href="#①-入力変数が-6-つあるか" title="Permanent link">&para;</a></h4>
+<p><strong><code>"globals":</code></strong> で検索してください。1 箇所だけヒットします。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nt">"globals"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"loan_id"</span><span class="p">,</span><span class="w">              </span><span class="nt">"direction"</span><span class="p">:</span><span class="w"> </span><span class="s2">"in"</span><span class="p">,</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span><span class="w"> </span><span class="nt">"triggerNodeId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"start"</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"applicant_first_name"</span><span class="p">,</span><span class="w"> </span><span class="nt">"direction"</span><span class="p">:</span><span class="w"> </span><span class="s2">"in"</span><span class="p">,</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span><span class="w"> </span><span class="nt">"triggerNodeId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"start"</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"applicant_last_name"</span><span class="p">,</span><span class="w">  </span><span class="nt">"direction"</span><span class="p">:</span><span class="w"> </span><span class="s2">"in"</span><span class="p">,</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span><span class="w"> </span><span class="nt">"triggerNodeId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"start"</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"loan_amount"</span><span class="p">,</span><span class="w">          </span><span class="nt">"direction"</span><span class="p">:</span><span class="w"> </span><span class="s2">"in"</span><span class="p">,</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"number"</span><span class="p">,</span><span class="w"> </span><span class="nt">"triggerNodeId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"start"</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"loan_term"</span><span class="p">,</span><span class="w">            </span><span class="nt">"direction"</span><span class="p">:</span><span class="w"> </span><span class="s2">"in"</span><span class="p">,</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"number"</span><span class="p">,</span><span class="w"> </span><span class="nt">"triggerNodeId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"start"</span><span class="w"> </span><span class="p">},</span>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"income"</span><span class="p">,</span><span class="w">               </span><span class="nt">"direction"</span><span class="p">:</span><span class="w"> </span><span class="s2">"in"</span><span class="p">,</span><span class="w"> </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"number"</span><span class="p">,</span><span class="w"> </span><span class="nt">"triggerNodeId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"start"</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="p">]</span>
+</code></pre></div>
+<p><code>"direction": "in"</code> の項目が <strong>6 つ</strong>あるか見てください。これが手順6 で実行時に入力する値になります。</p>
+<h4 id="②-2-つの条件分岐が正しい変数を見ているか">② 2 つの条件分岐が正しい変数を見ているか<a class="headerlink" href="#②-2-つの条件分岐が正しい変数を見ているか" title="Permanent link">&para;</a></h4>
+<p><code>core.logic.decision</code> のノードが 2 つあります。それぞれの <code>inputs.expression</code> を見てください。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="p">{</span><span class="w"> </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"checkRiskBand"</span><span class="p">,</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"core.logic.decision"</span><span class="p">,</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span><span class="nt">"inputs"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"expression"</span><span class="p">:</span><span class="w"> </span><span class="s2">"$vars.underwritingAgent.output.risk_band === \"Low\""</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="p">{</span><span class="w"> </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"checkOfficerDecision"</span><span class="p">,</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">  </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"core.logic.decision"</span><span class="p">,</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="w">  </span><span class="nt">"inputs"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"expression"</span><span class="p">:</span><span class="w"> </span><span class="s2">"$vars.officerReview.status === \"Approve\""</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+<p>2 つ目が <strong><code>$vars.officerReview.status</code></strong> を見ている点に注目してください。アプリの出力そのものではなく、人的タスクの結果（<code>status</code>）で分岐します。Studio Web を開いたときに出る警告（セクション末尾）は、この作りに由来します。</p>
+<h4 id="③-人的タスクに-12-項目がマッピングされているか">③ 人的タスクに 12 項目がマッピングされているか<a class="headerlink" href="#③-人的タスクに-12-項目がマッピングされているか" title="Permanent link">&para;</a></h4>
+<p><strong><code>"appInputBindings":</code></strong> で検索してください。1 箇所だけヒットします。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nt">"appInputBindings"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="nt">"LoanId"</span><span class="p">:</span><span class="w">             </span><span class="s2">"=vars.start.output.loan_id"</span><span class="p">,</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span><span class="nt">"ApplicantFirstName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"=vars.start.output.applicant_first_name"</span><span class="p">,</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">  </span><span class="nt">"ApplicantLastName"</span><span class="p">:</span><span class="w">  </span><span class="s2">"=vars.start.output.applicant_last_name"</span><span class="p">,</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">  </span><span class="nt">"LoanAmount"</span><span class="p">:</span><span class="w">         </span><span class="s2">"=vars.start.output.loan_amount"</span><span class="p">,</span>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="w">  </span><span class="nt">"LoanTerm"</span><span class="p">:</span><span class="w">           </span><span class="s2">"=vars.start.output.loan_term"</span><span class="p">,</span>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="w">  </span><span class="nt">"YearlyIncome"</span><span class="p">:</span><span class="w">       </span><span class="s2">"=vars.start.output.income"</span><span class="p">,</span>
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="w">  </span><span class="nt">"CreditScore"</span><span class="p">:</span><span class="w">        </span><span class="s2">"=vars.underwritingAgent.output.credit_score"</span><span class="p">,</span>
+<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="w">  </span><span class="nt">"RiskBand"</span><span class="p">:</span><span class="w">           </span><span class="s2">"=vars.underwritingAgent.output.risk_band"</span><span class="p">,</span>
+<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="w">  </span><span class="nt">"AssessmentSummary"</span><span class="p">:</span><span class="w">  </span><span class="s2">"=vars.underwritingAgent.output.assessment_summary"</span><span class="p">,</span>
+<a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a><span class="w">  </span><span class="nt">"MonthlyRepayment"</span><span class="p">:</span><span class="w">   </span><span class="s2">"=vars.underwritingAgent.output.monthly_repayment"</span><span class="p">,</span>
+<a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a><span class="w">  </span><span class="nt">"DebtToIncomeRatio"</span><span class="p">:</span><span class="w">  </span><span class="s2">"=vars.underwritingAgent.output.debt_to_income_ratio"</span><span class="p">,</span>
+<a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a><span class="w">  </span><span class="nt">"LoanToMarketRatio"</span><span class="p">:</span><span class="w">  </span><span class="s2">"=vars.underwritingAgent.output.loan_to_market_ratio"</span>
+<a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>12 行あり、右辺がすべて <code>=vars....</code> で埋まっていますか。</strong> 前半 6 項目が Start ノードから、後半 6 項目が確認1 で見たエージェントの出力から来ています。右辺が <code>""</code> だったり項目が欠けていたりすると、<strong>手順6 で担当者の画面のその欄が空になります。</strong></p>
+<p>足りないものがあれば、コーディングエージェントに不足分を伝えて直してもらってください。</p>
+<h3 id="-確認3-bindings-の順序を必ず確認する">⚠️ 確認3: <code>bindings[]</code> の順序を必ず確認する<a class="headerlink" href="#-確認3-bindings-の順序を必ず確認する" title="Permanent link">&para;</a></h3>
+<p><strong>このレッスンで最も見つけにくい不具合です。</strong> <code>.flow</code> の <code>bindings[]</code> 配列を開き、<strong>アプリ用のバインディングがエージェント用より前にある</strong>ことを確認してください。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="nt">"bindings"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span><span class="p">{</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">    </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"bindingLoanOfficerDashboardName"</span><span class="p">,</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">    </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"name"</span><span class="p">,</span>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">    </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="w">    </span><span class="nt">"resource"</span><span class="p">:</span><span class="w"> </span><span class="s2">"app"</span><span class="p">,</span>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="w">    </span><span class="nt">"resourceKey"</span><span class="p">:</span><span class="w"> </span><span class="s2">"CodingAgentsWorkshop.loanofficerdashboard"</span><span class="p">,</span>
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="w">    </span><span class="nt">"default"</span><span class="p">:</span><span class="w"> </span><span class="s2">"loanofficerdashboard"</span><span class="p">,</span>
+<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="w">    </span><span class="nt">"propertyAttribute"</span><span class="p">:</span><span class="w"> </span><span class="s2">"name"</span><span class="p">,</span>
+<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="w">    </span><span class="nt">"resourceSubType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"CodedAction"</span>
+<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a><span class="w">  </span><span class="p">},</span>
+<a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a><span class="w">  </span><span class="p">{</span>
+<a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a><span class="w">    </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"bindingLoanOfficerDashboardFolderPath"</span><span class="p">,</span>
+<a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a><span class="w">    </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"folderPath"</span><span class="p">,</span>
+<a id="__codelineno-12-15" name="__codelineno-12-15" href="#__codelineno-12-15"></a><span class="w">    </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span>
+<a id="__codelineno-12-16" name="__codelineno-12-16" href="#__codelineno-12-16"></a><span class="w">    </span><span class="nt">"resource"</span><span class="p">:</span><span class="w"> </span><span class="s2">"app"</span><span class="p">,</span>
+<a id="__codelineno-12-17" name="__codelineno-12-17" href="#__codelineno-12-17"></a><span class="w">    </span><span class="nt">"resourceKey"</span><span class="p">:</span><span class="w"> </span><span class="s2">"CodingAgentsWorkshop.loanofficerdashboard"</span><span class="p">,</span>
+<a id="__codelineno-12-18" name="__codelineno-12-18" href="#__codelineno-12-18"></a><span class="w">    </span><span class="nt">"default"</span><span class="p">:</span><span class="w"> </span><span class="s2">"CodingAgentsWorkshop"</span><span class="p">,</span>
+<a id="__codelineno-12-19" name="__codelineno-12-19" href="#__codelineno-12-19"></a><span class="w">    </span><span class="nt">"propertyAttribute"</span><span class="p">:</span><span class="w"> </span><span class="s2">"folderPath"</span><span class="p">,</span>
+<a id="__codelineno-12-20" name="__codelineno-12-20" href="#__codelineno-12-20"></a><span class="w">    </span><span class="nt">"resourceSubType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"CodedAction"</span>
+<a id="__codelineno-12-21" name="__codelineno-12-21" href="#__codelineno-12-21"></a><span class="w">  </span><span class="p">},</span>
+<a id="__codelineno-12-22" name="__codelineno-12-22" href="#__codelineno-12-22"></a><span class="w">  </span><span class="p">{</span>
+<a id="__codelineno-12-23" name="__codelineno-12-23" href="#__codelineno-12-23"></a><span class="w">    </span><span class="nt">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"bindingLoanUnderwritingAgentName"</span><span class="p">,</span>
+<a id="__codelineno-12-24" name="__codelineno-12-24" href="#__codelineno-12-24"></a><span class="w">    </span><span class="nt">"..."</span><span class="p">:</span><span class="w"> </span><span class="s2">"エージェント用はこの後ろに"</span>
+<a id="__codelineno-12-25" name="__codelineno-12-25" href="#__codelineno-12-25"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-12-26" name="__codelineno-12-26" href="#__codelineno-12-26"></a><span class="p">]</span>
+</code></pre></div>
+<div class="admonition danger">
+<p class="admonition-title">アプリ用のバインディングが無いとどうなるか</p>
+<p>人的タスク（Action App）のノードは、<strong><code>bindings[]</code> 配列で最初に見つかった同名のバインディングを使います。</strong> アプリ用が無いと、エージェント用のものを掴んでしまいます。</p>
+<p>結果、実行時にこうなります。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>ErrorCode 170015
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>No app: LoanUnderwritingAgent found in folder: CodingAgentsWorkshop
+</code></pre></div>
+<p><strong>アプリを探しているのにエージェントの名前が出る</strong>のが特徴です。しかも <code>uip maestro flow validate</code> は <code>Valid</code> を返すため、<strong>実行するまで気づけません。</strong></p>
+</div>
+<p>アプリがソリューションリソースに登録されていない場合は、手動で追加できます。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="nb">cd</span><span class="w"> </span>LoanUnderwritingProcess
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>uip<span class="w"> </span>solution<span class="w"> </span>resources<span class="w"> </span>add<span class="w"> </span>--source<span class="w"> </span>remote<span class="w"> </span>--kind<span class="w"> </span>App<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">  </span>--name<span class="w"> </span><span class="s2">"loanofficerdashboard"</span><span class="w"> </span>--folder-path<span class="w"> </span><span class="s2">"CodingAgentsWorkshop"</span><span class="w"> </span>--output<span class="w"> </span>json
+</code></pre></div>
+<h3 id="条件の向きを変えたいとき">条件の向きを変えたいとき<a class="headerlink" href="#条件の向きを変えたいとき" title="Permanent link">&para;</a></h3>
+<p>マッピングや条件の調整が必要な場合は、コーディングエージェントに次のように依頼します。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>リスクバンドの条件を修正して、既定の経路が人的レビューのノードに向かい、明示的な条件分岐のほうで
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>"Low" の自動承認ケースを処理するようにしてください。
+</code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">Studio Web でフローを可視化する</p>
+<p>ソリューションは <strong>Studio Web</strong> にアップロードでき、Orchestrator にデプロイする前にプロセスの図を確認できます。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="nb">cd</span><span class="w"> </span>LoanApplicationUnderwriting
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>uip<span class="w"> </span>solution<span class="w"> </span>upload<span class="w"> </span>.<span class="w"> </span>--output<span class="w"> </span>json
+</code></pre></div>
+<p>返ってきた <code>DesignerUrl</code> をブラウザーで開くと、コーディングエージェントが生成したとおりのノード、条件、接続がキャンバスに描画されます。</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">確認は内容を確定させてから行ってください</p>
+<p><strong>Studio Web で一度開いたソリューションは、CLI から上書きできなくなります。</strong>
+<code>uip solution upload</code> が次のエラーを返すようになります。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>HTTP 500 on POST .../Solution/&lt;id&gt;/Overwrite
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>Could not find a part of the path '/storage/azure/.../.project/...'
+</code></pre></div>
+<p>ブラウザーのタブを閉じても解消しません（<code>uip solution download</code> での読み出しは可能です）。</p>
+<p><strong>対処</strong>: <code>LoanApplicationUnderwriting.uipx</code> の <code>SolutionId</code> を新しい GUID に書き換えて
+<code>uip solution upload</code> すると、<strong>新規ソリューションとして作成されます。</strong> 古いほうは次で削除します。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>uip<span class="w"> </span>solution<span class="w"> </span>delete<span class="w"> </span>&lt;古い<span class="w"> </span>SolutionId&gt;<span class="w"> </span>--yes<span class="w"> </span>--output<span class="w"> </span>json
+</code></pre></div>
+<p>そのため、<strong>フローが一通りできてから Studio Web で確認する</strong>のがおすすめです。</p>
+</div>
+<div class="admonition danger">
+<p class="admonition-title">「結果「Reject」には下流のノードがありません」が出ますが、直さないでください</p>
+<p>Studio Web でフローを開くと、ヘルス アナライザーに次の警告が出ます。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>結果「Reject」には下流のノードがありません。接続を追加するか、結果を削除してください。
+</code></pre></div>
+<p><strong>これは表示上のものです。実行時の正しさには影響しません。</strong> 人的タスクには <code>Approve</code> / <code>Reject</code> の
+2 つの outcome を定義していますが、ノードの出力ポートは <code>completed</code> の 1 つだけです。どちらの判断
+だったかは、そのあとの<strong>判定ノードが <code>$vars.officerReview.status</code> を見て分岐</strong>します
+（確認2 の ② で見た 2 つ目の条件分岐です）。デザイナーは outcome ごとに接続を期待するため、
+唯一のエッジを最初の outcome（Approve）に紐づけて表示し、Reject を「未接続」と見なします。</p>
+<p><strong>消そうとすると壊れます。</strong> エッジの出力ポートを <code>outcome-approve</code> / <code>outcome-reject</code> に分けると、
+<strong><code>uip maestro flow validate</code> は <code>Valid</code> を返し、この警告も消えます。</strong> しかし<strong>実行すると誤った経路を
+通ります。</strong> 生成される BPMN を見ると理由は明らかです。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="nt">&lt;bpmn:sequenceFlow</span><span class="w"> </span><span class="na">sourceRef=</span><span class="s">"officerReview"</span><span class="w"> </span><span class="na">targetRef=</span><span class="s">"endApproved"</span><span class="w"> </span><span class="nt">/&gt;</span><span class="w">   </span><span class="cm">&lt;!-- 条件なし --&gt;</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="nt">&lt;bpmn:sequenceFlow</span><span class="w"> </span><span class="na">sourceRef=</span><span class="s">"officerReview"</span><span class="w"> </span><span class="na">targetRef=</span><span class="s">"endRejected"</span><span class="w"> </span><span class="nt">/&gt;</span><span class="w">  </span><span class="cm">&lt;!-- 条件なし --&gt;</span>
+</code></pre></div>
+<p>条件式が付かないため、どちらを通るかが決まりません。実測では <strong>Approve で完了しても
+<code>final_decision: "Rejected"</code> が返りました。</strong></p>
+<p><strong>判定ノードで分岐する構成のままにしてください。</strong> 承認・却下の両方が正しく動くことを確認済みです。</p>
+</div>
+<h2 id="4-テスト用のローン見積を用意する">4. テスト用のローン見積を用意する<a class="headerlink" href="#4-テスト用のローン見積を用意する" title="Permanent link">&para;</a></h2>
+<div class="admonition warning">
+<p class="admonition-title">固定の loan_id は載せていません</p>
+<p>UiBank は共有のデモ環境で、<strong>データは日々追加され、ときどきリセットされます。</strong> レッスン1 で確定した 3 件がまだ生きていればそれを使ってください。</p>
+</div>
+<p>まず生存を確認します。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>curl<span class="w"> </span>-s<span class="w"> </span>-o<span class="w"> </span>/dev/null<span class="w"> </span>-w<span class="w"> </span><span class="s2">"%{http_code}\n"</span><span class="w"> </span>https://uibank-api.uipath.com/api/quotes/&lt;loan_id&gt;
+</code></pre></div>
+<p>404 が返る、またはレッスン1 から時間が空いた場合は、次のプロンプトで選び直してください。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>UiBank の Swagger ドキュメントを開いて内容を確認してください:
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>https://uibank-api.uipath.com/explorer/swagger.json
+<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>
+<a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a>読み取り専用のエンドポイントのみを使い、リスクプロファイルに幅がある既存のローン見積を 3 件見つけ、
+<a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a>LoanUnderwritingProcess フロー用のテスト入力を生成してください。
+<a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a>
+<a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a>要件:
+<a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a>- Swagger 仕様に記載された GET エンドポイントのみを使用すること。
+<a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a>- データの作成・更新・削除は一切行わないこと。
+<a id="__codelineno-22-10" name="__codelineno-22-10" href="#__codelineno-22-10"></a>- loan_id を捏造したり、存在を確認していない ID を使い回したりしないこと。
+<a id="__codelineno-22-11" name="__codelineno-22-11" href="#__codelineno-22-11"></a>- 選んだローンレコードが実在することを検証すること。
+<a id="__codelineno-22-12" name="__codelineno-22-12" href="#__codelineno-22-12"></a>- loan_amount、loan_term、income は同一の検証済みレコードから設定すること。
+<a id="__codelineno-22-13" name="__codelineno-22-13" href="#__codelineno-22-13"></a>- loan_term は年数を表し、1、3、5、10 のいずれかでなければならない。
+<a id="__codelineno-22-14" name="__codelineno-22-14" href="#__codelineno-22-14"></a>- 申込者名は UiBank が提供しないため、演習用の安全な値を 3 件分つけること。
+<a id="__codelineno-22-15" name="__codelineno-22-15" href="#__codelineno-22-15"></a>- 3 件分の JSON オブジェクトを返すこと。
+<a id="__codelineno-22-16" name="__codelineno-22-16" href="#__codelineno-22-16"></a>
+<a id="__codelineno-22-17" name="__codelineno-22-17" href="#__codelineno-22-17"></a>出力形式:
+<a id="__codelineno-22-18" name="__codelineno-22-18" href="#__codelineno-22-18"></a>{
+<a id="__codelineno-22-19" name="__codelineno-22-19" href="#__codelineno-22-19"></a>  "loan_id": "&lt;VERIFIED_LOAN_ID&gt;",
+<a id="__codelineno-22-20" name="__codelineno-22-20" href="#__codelineno-22-20"></a>  "applicant_first_name": "&lt;FIRST_NAME&gt;",
+<a id="__codelineno-22-21" name="__codelineno-22-21" href="#__codelineno-22-21"></a>  "applicant_last_name": "&lt;LAST_NAME&gt;",
+<a id="__codelineno-22-22" name="__codelineno-22-22" href="#__codelineno-22-22"></a>  "loan_amount": &lt;LOAN_AMOUNT&gt;,
+<a id="__codelineno-22-23" name="__codelineno-22-23" href="#__codelineno-22-23"></a>  "loan_term": &lt;1_OR_3_OR_5_OR_10&gt;,
+<a id="__codelineno-22-24" name="__codelineno-22-24" href="#__codelineno-22-24"></a>  "income": &lt;YEARLY_INCOME&gt;
+<a id="__codelineno-22-25" name="__codelineno-22-25" href="#__codelineno-22-25"></a>}
+</code></pre></div>
+<div class="admonition important">
+<p class="admonition-title">リスクバンドは実行して確かめてください</p>
+<p><code>risk_band</code> は LLM が借入額・期間・債務所得比率・市場平均との比を総合して判断します。<strong>債務所得比率だけで狙ったバンドになるとは限りません。</strong></p>
+<p>レッスン1 の手順4 で 3 件が Low / Medium / High に分かれることを確認済みであれば、そのまま使えます。確認していない場合は、手順6 の実行結果を見て、分かれていなければ選び直してください。</p>
+</div>
+<h2 id="5-検証して公開する">5. 検証して公開する<a class="headerlink" href="#5-検証して公開する" title="Permanent link">&para;</a></h2>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">手動で行う場合</label><label for="__tabbed_1_2">コーディングエージェントに任せる場合</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>生成された <code>.flow</code> ファイルがあるフォルダーに移動します。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="nb">cd</span><span class="w"> </span>LoanApplicationUnderwriting/LoanUnderwritingProcess
+</code></pre></div>
+<p>パックする前に、フローを検証します。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>uip<span class="w"> </span>maestro<span class="w"> </span>flow<span class="w"> </span>validate<span class="w"> </span>LoanUnderwritingProcess.flow
+</code></pre></div>
+<p><code>"Status": "Valid"</code> が返れば構文上の問題はありません。</p>
+<div class="admonition note">
+<p class="admonition-title"><code>validate</code> が通っても実行できるとは限りません</p>
+<p>手順3 で説明した <code>bindings[]</code> の問題は、<code>validate</code> では検出されません。<strong>必ず手順3 の確認を済ませてください。</strong></p>
+</div>
+<p><code>command not found</code> エラーが出る場合は、maestro ツールが未インストールです。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>uip<span class="w"> </span>tools<span class="w"> </span>install<span class="w"> </span>@uipath/maestro-tool
+</code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">初回は数分かかることがあります</p>
+<p>ツールのインストール時に CLI 本体とスキルの更新も走ります。コマンドが返ってこなくても、しばらく待ってください。</p>
+</div>
+<p>警告があれば修正し、そのうえでパッケージ化と公開を 1 コマンドで行います。</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">Windows (PowerShell)</label><label for="__tabbed_2_2">Mac / Linux</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="nb">cd </span><span class="p">..</span>
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="n">uip</span> <span class="n">maestro</span> <span class="n">flow</span> <span class="n">publish</span> <span class="s2">"LoanUnderwritingProcess"</span> <span class="s2">"$env:TEMP\dist"</span> <span class="p">-</span><span class="n">-version</span> <span class="n">1</span><span class="p">.</span><span class="n">0</span><span class="p">.</span><span class="n">0</span> <span class="p">-</span><span class="n">-output</span> <span class="n">json</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="nb">cd</span><span class="w"> </span>..
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>uip<span class="w"> </span>maestro<span class="w"> </span>flow<span class="w"> </span>publish<span class="w"> </span><span class="s2">"LoanUnderwritingProcess"</span><span class="w"> </span><span class="s2">"/tmp/dist"</span><span class="w"> </span>--version<span class="w"> </span><span class="m">1</span>.0.0<span class="w"> </span>--output<span class="w"> </span>json
+</code></pre></div>
+</div>
+</div>
+</div>
+<p><code>"Upload"</code> の <code>"Status": "OK"</code> が返れば、パッケージが Orchestrator にアップロードされています。</p>
+<p>続いてプロセスを作成します。</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="3:2"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">Windows (PowerShell)</label><label for="__tabbed_3_2">Mac / Linux</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="n">uip</span> <span class="n">or</span> <span class="n">processes</span> <span class="n">create</span> <span class="p">`</span>
+<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>  <span class="p">-</span><span class="n">-name</span> <span class="s2">"LoanUnderwritingProcess"</span> <span class="p">`</span>
+<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a>  <span class="p">-</span><span class="n">-package-key</span> <span class="s2">"LoanUnderwritingProcess.flow.Flow"</span> <span class="p">`</span>
+<a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a>  <span class="p">-</span><span class="n">-package-version</span> <span class="s2">"1.0.0"</span> <span class="p">`</span>
+<a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a>  <span class="p">-</span><span class="n">-folder-path</span> <span class="s2">"CodingAgentsWorkshop"</span> <span class="p">`</span>
+<a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a>  <span class="p">-</span><span class="n">-output</span> <span class="n">json</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>uip<span class="w"> </span>or<span class="w"> </span>processes<span class="w"> </span>create<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="w">  </span>--name<span class="w"> </span><span class="s2">"LoanUnderwritingProcess"</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="w">  </span>--package-key<span class="w"> </span><span class="s2">"LoanUnderwritingProcess.flow.Flow"</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a><span class="w">  </span>--package-version<span class="w"> </span><span class="s2">"1.0.0"</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-29-5" name="__codelineno-29-5" href="#__codelineno-29-5"></a><span class="w">  </span>--folder-path<span class="w"> </span><span class="s2">"CodingAgentsWorkshop"</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-29-6" name="__codelineno-29-6" href="#__codelineno-29-6"></a><span class="w">  </span>--output<span class="w"> </span>json
+</code></pre></div>
+</div>
+</div>
+</div>
+<p>返ってきた <code>Key</code> がプロセスキーです。手順6 で使います。</p>
+</div>
+<div class="tabbed-block">
+<p>次のプロンプトをコーディングエージェントに渡してください。検証・公開・デプロイまでを代行してくれます。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>いま構築した LoanUnderwritingProcess の Maestro フローを公開してデプロイしてください。
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>
+<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>1. 生成された .flow ファイルを見つけて検証し、報告された警告があれば修正してください。
+<a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a>2. bindings[] にアプリ用のバインディング対があり、エージェント用より前に置かれていることを
+<a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a>   確認してください。無ければ追加してください。
+<a id="__codelineno-30-6" name="__codelineno-30-6" href="#__codelineno-30-6"></a>3. uip maestro flow publish でバージョン 1.0.0 として公開してください。
+<a id="__codelineno-30-7" name="__codelineno-30-7" href="#__codelineno-30-7"></a>4. Orchestrator の CodingAgentsWorkshop フォルダーに、公開したパッケージからプロセスを
+<a id="__codelineno-30-8" name="__codelineno-30-8" href="#__codelineno-30-8"></a>   作成してください（--folder-path で指定してください）。
+<a id="__codelineno-30-9" name="__codelineno-30-9" href="#__codelineno-30-9"></a>5. プロセスキーを報告してください。
+</code></pre></div>
+</div>
+</div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">作り直すときはバージョンを上げてください</p>
+<p><code>.flow</code> を修正して公開し直す場合、<code>uip or processes update</code> では<strong>パッケージのバージョンを切り替えられません。</strong> プロセスを作り直す必要があります。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>uip<span class="w"> </span>or<span class="w"> </span>processes<span class="w"> </span>delete<span class="w"> </span>&lt;プロセスキー&gt;<span class="w"> </span>--yes<span class="w"> </span>--output<span class="w"> </span>json
+<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>uip<span class="w"> </span>or<span class="w"> </span>processes<span class="w"> </span>create<span class="w"> </span>--name<span class="w"> </span><span class="s2">"LoanUnderwritingProcess"</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a><span class="w">  </span>--package-key<span class="w"> </span><span class="s2">"LoanUnderwritingProcess.flow.Flow"</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a><span class="w">  </span>--package-version<span class="w"> </span><span class="s2">"1.0.1"</span><span class="w"> </span>--folder-path<span class="w"> </span><span class="s2">"CodingAgentsWorkshop"</span><span class="w"> </span>--output<span class="w"> </span>json
+</code></pre></div>
+</div>
+<h2 id="6-フロー全体をテストする">6. フロー全体をテストする<a class="headerlink" href="#6-フロー全体をテストする" title="Permanent link">&para;</a></h2>
+<p>Orchestrator からプロセスを 3 回起動します。手順4 で用意した申込ごとに 1 回ずつです。</p>
+<p><strong>Orchestrator</strong> → <strong>CodingAgentsWorkshop</strong> → <code>LoanUnderwritingProcess</code> → 実行</p>
+<table>
+<thead>
+<tr>
+<th>申込者</th>
+<th>想定される経路</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>低リスク（少額のローン、十分な収入）</td>
+<td>自動承認、人的タスクなし</td>
+</tr>
+<tr>
+<td>中リスク</td>
+<td>Action Center に人的タスクが発生</td>
+</tr>
+<tr>
+<td>高リスク</td>
+<td>Action Center に人的タスクが発生</td>
+</tr>
+</tbody>
+</table>
+<p>中・高リスクの申込については、プロセスが一時停止している間に <strong>Action Center</strong> を開いてください。クレジットスコアとリスクバンドがあらかじめ入力された状態で、ローン担当者用ダッシュボードが表示されるはずです。</p>
+<div class="admonition important">
+<p class="admonition-title">開いたら「Assign to self」をクリックしてください</p>
+<p>タスクは<strong>未割り当て</strong>の状態で作成されます。開いただけでは <strong>READ ONLY</strong> で、
+Approve / Reject のボタンを押せません。</p>
+<p>画面上部の <strong>「Assign to self」</strong> をクリックすると編集可能になります。</p>
+</div>
+<div class="admonition important">
+<p class="admonition-title">12 個すべてに値が入っているか</p>
+<p>ここが<strong>レッスン1 からの一貫性の最終確認</strong>です。ダッシュボードの 12 項目すべてに値が入っていれば、エージェント → フロー → アプリの経路が正しくつながっています。</p>
+<p>空欄があれば、レッスン1 のエージェント出力か、フローの変数マッピングのどちらかが欠けています。</p>
+</div>
+<p>判断を送信し、フローが対応する終了状態へ進むことを確認しましょう。ジョブの出力に <code>final_decision</code> が返っていれば成功です。</p>
+<div class="admonition tip">
+<p class="admonition-title">実行トレースを確認する</p>
+<p>Orchestrator では、実行中のフローインスタンスをクリックすると、アクティブなノードがハイライトされたライブの図を確認できます。各条件分岐が正しく振り分けられているかを確かめるには、これが最速の方法です。</p>
+</div>
+<h3 id="うまくいかないとき">うまくいかないとき<a class="headerlink" href="#うまくいかないとき" title="Permanent link">&para;</a></h3>
+<p>ジョブが失敗しているのに「実行中」に見えることがあります。<strong>Orchestrator のジョブ API は Maestro フローの失敗を隠すことがある</strong>ためです。Maestro 側の API で確認してください。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>uip<span class="w"> </span>maestro<span class="w"> </span>flow<span class="w"> </span>instance<span class="w"> </span>list<span class="w"> </span>-f<span class="w"> </span>&lt;フォルダーキー&gt;<span class="w"> </span>--output<span class="w"> </span>json
+<a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>uip<span class="w"> </span>maestro<span class="w"> </span>flow<span class="w"> </span>instance<span class="w"> </span>incidents<span class="w"> </span>&lt;インスタンスID&gt;<span class="w"> </span>-f<span class="w"> </span>&lt;フォルダーキー&gt;<span class="w"> </span>--output<span class="w"> </span>json
+</code></pre></div>
+<p><code>ErrorDetails</code> に <code>No app: ... found in folder:</code> と出ていれば、手順3 の <code>bindings[]</code> の問題です。</p>
+<p>その他の症状は<a href="../../troubleshooting/#maestro-フロー第2部-レッスン3">トラブルシューティング</a>を参照してください。</p>
+<hr />
+<h2 id="このレッスンでできたこと">このレッスンでできたこと<a class="headerlink" href="#このレッスンでできたこと" title="Permanent link">&para;</a></h2>
+<ul>
+<li>エージェントとアプリをつなぐ Maestro フローを構築した</li>
+<li><code>risk_band</code> による分岐（自動承認 / 人的レビュー）が動くことを確認した</li>
+<li>人的タスクに <strong>12 項目すべてが渡る</strong>ことを確認した</li>
+<li>どの経路でも <code>final_decision</code> が返ることを確認した</li>
+</ul>
+<p>次は <a href="../4-intake-enrichment/">4. 申込受付とデータ補完</a> で、このフローを起動する RPA ワークフローを作ります。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  ページトップへ戻る
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="フッター" >
+        
+          
+          <a href="../2-loan-officer-app/" class="md-footer__link md-footer__link--prev" aria-label="前: 2. ローン担当者レビュー用ダッシュボード">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                前
+              </span>
+              <div class="md-ellipsis">
+                2. ローン担当者レビュー用ダッシュボード
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../4-intake-enrichment/" class="md-footer__link md-footer__link--next" aria-label="次: 4. 申込受付とデータ補完">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                次
+              </span>
+              <div class="md-ellipsis">
+                4. 申込受付とデータ補完
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.footer", "toc.integrate", "search.highlight", "search.suggest", "content.code.copy", "content.tabs.link"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u30b3\u30d4\u30fc\u3057\u307e\u3057\u305f", "clipboard.copy": "\u30af\u30ea\u30c3\u30d7\u30dc\u30fc\u30c9\u3078\u30b3\u30d4\u30fc", "search.result.more.one": "\u3053\u306e\u30da\u30fc\u30b8\u5185\u306b\u3082\u30461\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.more.other": "\u3053\u306e\u30da\u30fc\u30b8\u5185\u306b\u3042\u3068#\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.none": "\u4f55\u3082\u898b\u3064\u304b\u308a\u307e\u305b\u3093\u3067\u3057\u305f", "search.result.one": "1\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.other": "#\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.placeholder": "\u691c\u7d22\u30ad\u30fc\u30ef\u30fc\u30c9\u3092\u5165\u529b\u3057\u3066\u304f\u3060\u3055\u3044", "search.result.term.missing": "\u691c\u7d22\u306b\u542b\u307e\u308c\u306a\u3044", "select.version": "\u30d0\u30fc\u30b8\u30e7\u30f3\u5207\u308a\u66ff\u3048"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../javascripts/extra.js"></script>
+      
+    
+  </body>
+</html>
