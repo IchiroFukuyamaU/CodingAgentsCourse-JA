@@ -53,7 +53,6 @@ COMMON = {
     "uibank_api": "https://uibank-api.uipath.com",
     "uibank_swagger": "https://uibank-api.uipath.com/explorer/swagger.json",
     # 学習者からの問い合わせ窓口。公開前に差し替えてください。
-    "contact": "（問い合わせ窓口を記載してください）",
 }
 
 

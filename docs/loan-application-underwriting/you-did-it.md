@@ -138,8 +138,6 @@ uip solution deploy run   --name "LoanUnderwritingDeploy"   --package-name "Loan
 ---
 
 !!! info "フィードバックをお寄せください"
-    本コースの内容についてご提案があれば、{{ contact }} までお知らせください。
-
     `uip` CLI や UiPath スキル自体の不具合は、`uip feedback send` で UiPath に直接報告できます。
 
 [**次のステップへ**](../next-steps.md)

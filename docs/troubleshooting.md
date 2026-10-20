@@ -373,7 +373,6 @@ curl -s -o /dev/null -w "%{http_code}\n" {{ uibank_api }}/api/quotes/<loan_id>
 
 1. 実行したコマンドと、そのときの出力（`--output json` 付き）を控える
 2. [演習環境の片付け](cleanup.md)で該当のリソースを削除し、そのレッスンをやり直す
-3. それでも解決しなければ {{ contact }} へ連絡する
 
 `uip` CLI や UiPath スキル自体の不具合と思われる場合は、次のコマンドで UiPath に直接報告できます。
 
