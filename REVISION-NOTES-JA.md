@@ -4,6 +4,7 @@
 
 - 改訂日: 2026-10
 - 検証環境: staging テナント（全レッスンを実機で通し、動作を確認）
+- **cloud 環境**: 小尾さん・王さんによるレビューで確認済み
 - 原典: `UiPathPartnersJPN/CodingAgentsCourse-JA` の `main`
 
 ---
@@ -123,5 +124,4 @@ ILT 版は別途、日本語コースとして準備中とのことなので、�
 
 - **スクリーンショット**: 原典も 2 枚のみで、本改訂では参照を外しています。GUI 操作の画面
   （Orchestrator の Apps 一覧、Action Center、Maestro のライブ図）は撮影して追加する価値があります
-- **cloud 環境での再検証**: 本改訂は staging で検証しました。cloud では LLM モデルの可用性と
-  Maestro / Coded Apps の有効化状態の確認が必要です
+
