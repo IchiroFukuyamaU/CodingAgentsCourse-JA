@@ -62,8 +62,7 @@
   font-family: 'Nunito', var(--jp-font-stack);
 }
 
-.md-header__button,
-.md-header__button.md-logo {
+.md-header__button {
   color: #1a1a1a;
 }
 
@@ -72,10 +71,10 @@
   opacity: 1;
 }
 
-/* Scale the logo to a comfortable height in the header */
-.md-header__button.md-logo img {
-  height: 1.4rem;
-  width: auto;
+/* ヘッダーのロゴは非表示にし、サイトタイトルだけを見せる
+   （ハンバーガーメニュー内のロゴも同じクラスのため一緒に消えます） */
+.md-logo {
+  display: none;
 }
 
 /* ── Mobile drawer (hamburger menu) ─────────────────────────────────────── */
@@ -102,12 +101,6 @@
   /* Back-arrow / logo button colour inside the drawer title */
   .md-nav--primary > .md-nav__title .md-nav__button {
     color: #1a1a1a !important;
-  }
-
-  /* Logo size inside the drawer */
-  .md-nav--primary > .md-nav__title .md-logo img {
-    height: 1.6rem;
-    width: auto;
   }
 
   /* Nav item links — 20% smaller than body text in hamburger menu */

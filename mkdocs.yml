@@ -10,7 +10,6 @@ exclude_docs: |
 theme:
   name: material
   language: ja
-  logo: assets/images/Partner Success Logo.png
   favicon: assets/images/favicon.png
   font:
     text: Inter
